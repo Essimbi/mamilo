@@ -69,10 +69,6 @@ import { inject } from '@angular/core';
           <div class="copyright">
             © {{ currentYear }} {{ s()?.siteName || 'Mamilo Insights' }}. Tous les droits réservés.
           </div>
-          <div class="bottom-links">
-            <a href="#">Politique de confidentialité</a>
-            <a href="#">Conditions d'utilisation</a>
-          </div>
         </div>
       </div>
     </footer>

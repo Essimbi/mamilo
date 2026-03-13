@@ -1,14 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GlobalStateService } from '../../../core/services/global-state.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { Event } from '../../../core/models/event.model';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-angular';
 
 @Component({
   selector: 'app-events-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   styleUrl: './events-list.component.scss',
   template: `
@@ -25,9 +26,21 @@ import { LucideAngularModule } from 'lucide-angular';
           </div>
           <div class="hero-right">
             <div class="status-toggle">
-              <button class="toggle-btn active">Tous</button>
-              <button class="toggle-btn">Prochains</button>
-              <button class="toggle-btn">Passés</button>
+              <button 
+                (click)="selectedStatus.set('all')"
+                class="toggle-btn" 
+                [class.active]="selectedStatus() === 'all'"
+              >Tous</button>
+              <button 
+                (click)="selectedStatus.set('upcoming')"
+                class="toggle-btn" 
+                [class.active]="selectedStatus() === 'upcoming'"
+              >Prochains</button>
+              <button 
+                (click)="selectedStatus.set('past')"
+                class="toggle-btn" 
+                [class.active]="selectedStatus() === 'past'"
+              >Passés</button>
             </div>
           </div>
         </div>
@@ -38,13 +51,24 @@ import { LucideAngularModule } from 'lucide-angular';
         <div class="filter-container">
           <div class="categories">
             <span class="filter-label">FILTRER PAR CATÉGORIE :</span>
-            <a href="#" class="category-link">Keynotes</a>
-            <a href="#" class="category-link">Ateliers</a>
-            <a href="#" class="category-link">Colloques</a>
-            <a href="#" class="category-link">Séminaires</a>
+            <button 
+              *ngFor="let cat of categories; trackBy: trackByCategory" 
+              (click)="selectedCategory.set(cat)"
+              class="category-link"
+              [class.active]="selectedCategory() === cat"
+            >
+              {{ cat }}
+            </button>
+            <button 
+              (click)="selectedCategory.set('Tous')"
+              class="category-link"
+              [class.active]="selectedCategory() === 'Tous'"
+            >
+              Tous
+            </button>
           </div>
           <div class="results-count">
-            Affichage de 8 résultats
+            Affichage de {{ filteredEvents().length }} résultats
           </div>
         </div>
       </nav>
@@ -52,10 +76,10 @@ import { LucideAngularModule } from 'lucide-angular';
       <!-- Main Grid Content -->
       <main class="events-grid-section">
         <div class="grid-container">
-          <div *ngIf="events()?.length; else loading" class="events-grid">
-            <article *ngFor="let event of events()" class="event-card" [class.is-past]="event.status === 'past'">
+          <div *ngIf="filteredEvents().length; else loading" class="events-grid">
+            <article *ngFor="let event of filteredEvents(); trackBy: trackByEvent" class="event-card" [class.is-past]="event.status === 'past'">
               <div class="card-visual">
-                <img [src]="event.coverImage?.url || 'assets/images/placeholder.jpg'" [alt]="event.title" class="event-img">
+                <img [src]="event.coverImage?.url || 'assets/images/placeholder.jpg'" [alt]="event.title" class="event-img" loading="lazy" decoding="async">
                 <div class="date-badge">
                   <span class="month">{{ event.startDate | date:'MMM' }}</span>
                   <span class="day">{{ event.startDate | date:'dd' }}</span>
@@ -81,6 +105,10 @@ import { LucideAngularModule } from 'lucide-angular';
                   <div class="info-item">
                     <lucide-icon name="clock" size="14"></lucide-icon>
                     <span>{{ event.startDate | date:'HH:mm' }} — {{ event.endDate | date:'HH:mm' }} GMT</span>
+                  </div>
+                  <div class="info-item" *ngIf="event.likesCount">
+                    <lucide-icon name="heart" size="14"></lucide-icon>
+                    <span>{{ event.likesCount }} intéressés</span>
                   </div>
                 </div>
 
@@ -111,11 +139,11 @@ import { LucideAngularModule } from 'lucide-angular';
       <!-- CTA Engagement Section -->
       <section class="engagement-cta">
         <div class="cta-container">
-          <h2 class="cta-title">Organiser une conférence ou un atelier ?</h2>
+          <h2 class="cta-title" style="color: aliceblue !important;">Organiser une conférence ou un atelier ?</h2>
           <p class="cta-text">
             Le Dr Smith est disponible pour des conférences, des interventions dans les médias et des missions de conseil institutionnel sur des sujets liés à l'éthique et à la communication numériques modernes.
           </p>
-          <button class="cta-button">Demander un engagement</button>
+          <button routerLink="/contact" class="cta-button">Demander un engagement</button>
         </div>
       </section>
 
@@ -131,9 +159,29 @@ export class EventsListComponent implements OnInit {
   private state = inject(GlobalStateService);
   private seoService = inject(SeoService);
 
-  events = this.state.events;
+  selectedStatus = signal<'all' | 'upcoming' | 'past'>('all');
+  selectedCategory = signal<string>('Tous');
+  
+  categories = ['Keynotes', 'Ateliers', 'Colloques', 'Séminaires'];
+
+  filteredEvents = computed(() => {
+    let events = this.state.events();
+    
+    if (this.selectedStatus() !== 'all') {
+      events = events.filter(e => e.status === this.selectedStatus());
+    }
+    
+    if (this.selectedCategory() !== 'Tous') {
+      events = events.filter(e => e.type === this.selectedCategory());
+    }
+    
+    return events;
+  });
 
   ngOnInit(): void {
     this.seoService.updateTitle('Événements');
   }
+
+  trackByEvent(_: number, event: any) { return event.id; }
+  trackByCategory(_: number, cat: string) { return cat; }
 }

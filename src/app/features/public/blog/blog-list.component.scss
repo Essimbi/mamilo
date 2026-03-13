@@ -13,13 +13,19 @@
 
     .header-content {
         @include container;
+        position: relative;
+        z-index: 1;
 
         h1 {
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3rem);
             font-weight: 800;
             margin-bottom: 1.5rem;
             color: $white;
             font-family: $font-sans;
+
+            @include mobile {
+                text-align: center;
+            }
         }
 
         p {
@@ -28,6 +34,52 @@
             font-family: $font-serif;
             max-width: 42rem;
             line-height: 1.625;
+
+            @include mobile {
+                text-align: center;
+                font-size: 1.1rem;
+            }
+        }
+
+        .search-result-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: 1rem;
+
+            @include mobile {
+                align-items: center;
+            }
+            
+            p {
+                margin: 0;
+                font-family: $font-sans !important;
+                font-size: 1.15rem !important;
+                color: $slate-100 !important;
+            }
+
+            .btn-clear-search {
+                align-self: flex-start;
+                background: rgba($white, 0.05);
+                border: 1px solid rgba($white, 0.2);
+                color: $white;
+                padding: 0.5rem 1.25rem;
+                border-radius: 0.5rem;
+                font-size: 0.9rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                @include mobile {
+                    align-self: center;
+                }
+
+                &:hover {
+                    background-color: rgba($white, 0.15);
+                    border-color: $white;
+                    transform: translateY(-1px);
+                }
+            }
         }
     }
 }

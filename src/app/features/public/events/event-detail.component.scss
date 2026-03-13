@@ -94,6 +94,48 @@
             }
         }
     }
+
+    .hero-actions {
+        margin-top: 3rem;
+        display: flex;
+        justify-content: center;
+
+        .hero-like-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: rgba($white, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba($white, 0.2);
+            color: $white;
+            padding: 0.8rem 1.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            lucide-icon {
+                transition: transform 0.3s ease;
+            }
+
+            &:hover {
+                background-color: rgba($white, 0.2);
+                transform: translateY(-2px);
+            }
+
+            &.liked {
+                background-color: #e11d48;
+                border-color: #e11d48;
+                box-shadow: 0 10px 20px rgba(#e11d48, 0.3);
+
+                lucide-icon {
+                    fill: white;
+                    color: white;
+                }
+            }
+        }
+    }
 }
 
 // 2. Content Layout

@@ -1,14 +1,18 @@
-import { Component, OnInit, inject, ElementRef, PLATFORM_ID, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, PLATFORM_ID, HostListener, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SeoService } from '../../../core/services/seo.service';
 import { GlobalStateService } from '../../../core/services/global-state.service';
-import { LucideAngularModule, GraduationCap, Book, Mic, ExternalLink, Calendar, MapPin, ArrowRight, ChevronRight, Mail, Globe } from 'lucide-angular';
+import { LucideAngularModule, GraduationCap, Book, Mic, ExternalLink, Calendar, MapPin, ArrowRight, ChevronRight, Mail, Globe, Route } from 'lucide-angular';
 import { IContentService } from '../../../core/services/content.interface';
+import { NewsletterComponent } from '../../../shared/components/newsletter.component';
+import { PartnersComponent } from '../../../shared/components/partners.component';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, LucideAngularModule, NewsletterComponent, PartnersComponent, RouterModule],
   styleUrl: './about.component.scss',
   template: `
     <div class="about-page">
@@ -20,7 +24,7 @@ import { IContentService } from '../../../core/services/content.interface';
               <div class="profile-image-container">
                 <div class="image-frame-top"></div>
                 <div class="profile-image-wrapper">
-                  <img [src]="author()?.avatar?.url || '/hero-mamilo.png'" [alt]="author()?.name">
+                  <img [src]="authorVal?.avatar?.url || '/hero-mamilo.png'" [alt]="author()?.name" loading="eager" decoding="async" fetchpriority="high">
                 </div>
                 <div class="image-frame-bottom"></div>
               </div>
@@ -39,9 +43,9 @@ import { IContentService } from '../../../core/services/content.interface';
               </div>
               
               <div class="hero-actions">
-                <button class="btn-collaboration" routerLink="/contact">
+                <button class="btn-collaboration" (click)="onContact()">
                   <lucide-icon name="mail" size="18"></lucide-icon>
-                  Contact for Collaboration
+                  Contacter pour une collaboration
                 </button>
               </div>
             </div>
@@ -167,7 +171,7 @@ import { IContentService } from '../../../core/services/content.interface';
               <p class="pub-publisher">
                 {{ i % 2 === 0 ? 'Journal of Digital Psychology' : 'Stanford Academic Press' }}
               </p>
-              <a href="#" class="pub-link">
+              <a [href]="'https://scholar.google.com/scholar?q=' + i" target="_blank" class="pub-link">
                  DOI
                  <lucide-icon name="external-link" size="12"></lucide-icon>
               </a>
@@ -175,10 +179,10 @@ import { IContentService } from '../../../core/services/content.interface';
           </div>
 
           <div class="publications-action">
-            <button class="btn-outline">
+            <a routerLink="/articles" class="btn-outline">
               Voir toutes les publications
               <lucide-icon name="chevron-right" size="16"></lucide-icon>
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -283,39 +287,10 @@ import { IContentService } from '../../../core/services/content.interface';
       </section>
 
       <!-- 6. NEWSLETTER CTA -->
-      <section class="newsletter-section animate-on-scroll">
-        <div class="newsletter-inner">
-          <div class="newsletter-content">
-            <h2>Rejoignez le réseau intellectuel</h2>
-            <p>
-              Abonnez-vous pour recevoir chaque mois des résumés des nouvelles
-              recherches, des enregistrements d'événements et des recommandations
-              de livres directement du Dr Mamilo.
-            </p>
-          </div>
-          <div class="newsletter-action-area">
-            <form class="newsletter-form" (submit)="$event.preventDefault()">
-              <input type="email" placeholder="Entrez votre email académique" class="newsletter-input" />
-              <button type="submit" class="btn-newsletter">
-                Rejoindre
-              </button>
-            </form>
-            <p class="newsletter-privacy">
-              Nous respectons votre vie privée. Votre adresse ne sera jamais communiquée à des tiers.
-            </p>
-          </div>
-        </div>
-      </section>
+      <app-newsletter></app-newsletter>
 
       <!-- 7. PARTENAIRES -->
-      <section class="partners-section animate-on-scroll">
-        <div class="partners-inner">
-          <p class="partners-label">RECONNU ET PUBLIÉ PAR</p>
-          <div class="partners-grid">
-            <span *ngFor="let partner of mediaPartners" class="partner-name">{{ partner }}</span>
-          </div>
-        </div>
-      </section>
+      <app-partners></app-partners>
     </div>
     `
 })
@@ -328,26 +303,28 @@ export class AboutComponent implements OnInit, AfterViewInit {
   author = this.state.user;
   settings = this.state.settings;
   isBrowser: boolean;
+  authorVal: any | null = null;
 
-  mediaPartners = [
-    'Cambridge Press',
-    'The Economist',
-    'MIT Technology Review',
-    'Oxford University',
-    'Sage Journals'
-  ];
 
-  constructor() {
+  constructor(private router: Router) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
     const s = this.settings();
+    this.authorVal = this.author();
+    if (this.authorVal?.avatar) {
+      this.authorVal.avatar.url = '/hero-mamilo.png';
+    }
     this.seoService.updateTitle('À Propos');
     this.seoService.updateMeta(
       s?.siteDescription || 'Découvrez le Dr. ' + (this.author()?.name || 'Christian Mamilo'),
       s?.keywords || ['expert', 'parcours', 'about']
     );
+  }
+
+  onContact() {
+    this.router.navigate(['/contact']);
   }
 
   ngAfterViewInit(): void {
@@ -363,13 +340,13 @@ export class AboutComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private checkScrollAnimations(): void {
+  private checkScrollAnimations() {
     if (!this.isBrowser) return;
-
-    const elements = this.elementRef.nativeElement.querySelectorAll('.animate-on-scroll');
+    const elements = document.querySelectorAll('.animate-on-scroll');
     const windowHeight = window.innerHeight;
 
-    elements.forEach((element: HTMLElement) => {
+    elements.forEach((el: Element) => {
+      const element = el as HTMLElement;
       const elementTop = element.getBoundingClientRect().top;
       const elementVisible = 150;
 
@@ -377,5 +354,12 @@ export class AboutComponent implements OnInit, AfterViewInit {
         element.classList.add('animated');
       }
     });
+  }
+
+  onSeeAllPublications() {
+    const researchgate = this.author()?.social?.researchgate;
+    if (researchgate && this.isBrowser) {
+      window.open(researchgate, '_blank');
+    }
   }
 }

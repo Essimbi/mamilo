@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { GlobalStateService } from './global-state.service';
 import { MOCK_USER } from '../../mock-data/data/users.mock';
 import { Router } from '@angular/router';
@@ -8,12 +9,16 @@ import { of, delay, tap, catchError } from 'rxjs';
     providedIn: 'root'
 })
 export class AuthService {
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
     private state = inject(GlobalStateService);
     private router = inject(Router);
     private readonly STORAGE_KEY = 'mamilo_auth_user';
 
     constructor() {
-        this.checkAuth();
+        if (this.isBrowser) {
+            this.checkAuth();
+        }
     }
 
     login(credentials: { email: string; password?: string }) {
@@ -23,9 +28,10 @@ export class AuthService {
         return of(MOCK_USER).pipe(
             delay(1200),
             tap(user => {
-                // In a real app, we'd store a JWT token here
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
-                localStorage.setItem('mamilo_auth_token', 'simulated-jwt-token-xyz-123');
+                if (this.isBrowser) {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+                    localStorage.setItem('mamilo_auth_token', 'simulated-jwt-token-xyz-123');
+                }
 
                 this.state.setUser(user);
                 this.state.setLoading(false);
@@ -39,8 +45,10 @@ export class AuthService {
     }
 
     logout() {
-        localStorage.removeItem(this.STORAGE_KEY);
-        localStorage.removeItem('mamilo_auth_token');
+        if (this.isBrowser) {
+            localStorage.removeItem(this.STORAGE_KEY);
+            localStorage.removeItem('mamilo_auth_token');
+        }
         this.state.setUser(null);
         this.router.navigate(['/']);
     }

@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { IContentService, PostFilters, PaginationParams } from '../../core/services/content.interface';
@@ -17,6 +18,9 @@ import { MOCK_TAGS } from '../data/tags.mock';
     providedIn: 'root'
 })
 export class ContentMockService implements IContentService {
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
+
     private readonly STORAGE_KEY = 'mamilo_blog_posts';
     private readonly EVENTS_KEY = 'mamilo_blog_events';
     private readonly MEDIA_KEY = 'mamilo_blog_media';
@@ -29,18 +33,27 @@ export class ContentMockService implements IContentService {
     private profile: User = MOCK_USER;
 
     constructor() {
-        this.posts = this.loadFromStorage(this.STORAGE_KEY) || MOCK_POSTS;
-        this.events = this.loadFromStorage(this.EVENTS_KEY) || MOCK_EVENTS;
-        this.media = this.loadFromStorage(this.MEDIA_KEY) || [];
-        this.profile = this.loadFromStorage(this.PROFILE_KEY) || MOCK_USER;
+        if (this.isBrowser) {
+            this.posts = this.loadFromStorage(this.STORAGE_KEY) || MOCK_POSTS;
+            this.events = this.loadFromStorage(this.EVENTS_KEY) || MOCK_EVENTS;
+            this.media = this.loadFromStorage(this.MEDIA_KEY) || [];
+            this.profile = this.loadFromStorage(this.PROFILE_KEY) || MOCK_USER;
+        } else {
+            this.posts = MOCK_POSTS;
+            this.events = MOCK_EVENTS;
+            this.media = [];
+            this.profile = MOCK_USER;
+        }
     }
 
     private loadFromStorage(key: string): any {
+        if (!this.isBrowser) return null;
         const data = localStorage.getItem(key);
         return data ? JSON.parse(data) : null;
     }
 
     private saveToStorage(key: string, data: any) {
+        if (!this.isBrowser) return;
         localStorage.setItem(key, JSON.stringify(data));
     }
 
@@ -116,6 +129,8 @@ export class ContentMockService implements IContentService {
             publishedAt: null,
             scheduledAt: null,
             updatedAt: new Date().toISOString(),
+            likesCount: 0,
+            comments: [],
             category: post.category || MOCK_CATEGORIES[0],
             tags: post.tags || [],
             author: this.profile,
@@ -156,6 +171,7 @@ export class ContentMockService implements IContentService {
             recap: null,
             coverImage: event.coverImage || null,
             status: event.status || 'upcoming',
+            likesCount: 0,
             createdAt: new Date().toISOString()
         };
         this.events = [newEvent, ...this.events];
@@ -214,7 +230,7 @@ export class ContentMockService implements IContentService {
     }
 
     getSettings(): Observable<SiteSettings> {
-        const saved = localStorage.getItem(this.SETTINGS_KEY);
+        const saved = this.isBrowser ? localStorage.getItem(this.SETTINGS_KEY) : null;
         const settings = saved ? JSON.parse(saved) : {
             siteName: '3CM Editorial - Dr. Christian Mamilo',
             siteDescription: 'Plateforme éditoriale et académique du Dr. Christian Mamilo. Expertise en communication numérique.',
@@ -231,10 +247,49 @@ export class ContentMockService implements IContentService {
         return this.getSettings().pipe(
             map(current => {
                 const updated = { ...current, ...settings };
-                localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(updated));
+                if (this.isBrowser) {
+                    localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(updated));
+                }
                 return updated;
             }),
             delay(500)
         );
+    }
+
+    likePost(id: string): Observable<number> {
+        const index = this.posts.findIndex(p => p.id === id);
+        if (index === -1) return of(0);
+        
+        this.posts[index].likesCount++;
+        this.saveToStorage(this.STORAGE_KEY, this.posts);
+        return of(this.posts[index].likesCount).pipe(delay(200));
+    }
+
+    likeEvent(id: string): Observable<number> {
+        const index = this.events.findIndex(e => e.id === id);
+        if (index === -1) return of(0);
+        
+        this.events[index].likesCount++;
+        this.saveToStorage(this.EVENTS_KEY, this.events);
+        return of(this.events[index].likesCount).pipe(delay(200));
+    }
+
+    addComment(postId: string, comment: any): Observable<any> {
+        const index = this.posts.findIndex(p => p.id === postId);
+        if (index === -1) throw new Error('Post not found');
+
+        const newComment = {
+            id: 'cmt-' + Date.now(),
+            postId,
+            authorName: comment.authorName || 'Anonyme',
+            authorAvatar: comment.authorAvatar || 'assets/images/mock/avatar.jpg',
+            content: comment.content,
+            createdAt: new Date().toISOString(),
+            isApproved: true // Mock auto-approve
+        };
+
+        this.posts[index].comments = [...this.posts[index].comments || [], newComment];
+        this.saveToStorage(this.STORAGE_KEY, this.posts);
+        return of(newComment).pipe(delay(400));
     }
 }

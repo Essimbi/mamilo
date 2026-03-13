@@ -7,7 +7,7 @@
         <div class="hero-container">
 
             <!-- Contenu gauche -->
-            <div class="hero-content">
+            <div class="hero-content" appScrollReveal [delay]="100">
                 <span class="hero-eyebrow">Christian MAMILO</span>
 
                 <h1>
@@ -32,7 +32,7 @@
                     </button>
                 </div>
 
-                <div class="hero-stats">
+                <div class="hero-stats" appScrollReveal [delay]="300">
                     <div class="stat-item" *ngFor="let stat of stats(); let last = last">
                         <span class="stat-value">{{ stat.value }}</span>
                         <span class="stat-label">{{ stat.label }}</span>
@@ -41,7 +41,7 @@
             </div>
 
             <!-- Visuel droite -->
-            <div class="hero-visual">
+            <div class="hero-visual" appScrollReveal [delay]="200">
                 <div class="hero-image-frame">
                     <div class="profile-image-container">
                         <img src="/hero-mamilo.png" [alt]="author()?.name" class="profile-img" loading="eager" />
@@ -57,10 +57,10 @@
     <!-- ═══════════════════════════════════════════════
        3. ARTICLES EN VEDETTE
   ═══════════════════════════════════════════════ -->
-    <section class="featured-section animate-on-scroll">
+    <section class="featured-section" appScrollReveal>
         <div class="section-container">
 
-            <div class="section-header animate-on-scroll" style="animation-delay: 0.1s">
+            <div class="section-header">
                 <div class="section-heading">
                     <span class="section-eyebrow">— PUBLICATIONS</span>
                     <h2>Articles en vedette</h2>
@@ -76,8 +76,10 @@
             </div>
 
             <div class="articles-grid">
-                <div *ngFor="let post of latestPosts(); let i = index" class="article-card animate-on-scroll"
-                    [style.animation-delay]="(0.2 + i * 0.1) + 's'">
+                <div *ngFor="let post of latestPosts(); let i = index" 
+                     class="article-card" 
+                     appScrollReveal 
+                     [delay]="200 + (i * 100)">
                     <div class="card-image">
                         <img [src]="post.coverImage?.url" [alt]="post.title" loading="lazy" />
                         <span class="category-badge">{{ post.category.name }}</span>
@@ -109,11 +111,11 @@
     <!-- ═══════════════════════════════════════════════
        4. THÉORIE & PRATIQUE (APPROCHE)
   ═══════════════════════════════════════════════ -->
-    <section class="bridge-section animate-on-scroll">
+    <section class="bridge-section" appScrollReveal>
         <div class="bridge-container">
 
             <!-- Texte -->
-            <div class="bridge-content animate-on-scroll" style="animation-delay: 0.1s">
+            <div class="bridge-content">
                 <h2>
                     Combler le fossé entre la théorie
                     et la pratique professionnelle
@@ -154,9 +156,9 @@
             </div>
 
             <!-- Grille d'images -->
-            <div class="bridge-visual-grid animate-on-scroll" style="animation-delay: 0.2s">
+            <div class="bridge-visual-grid">
                 <div class="visual-circle"></div>
-                <div class="grid-column">
+                <div class="grid-column" appScrollReveal [delay]="200">
                     <div class="grid-item item--horizontal">
                         <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=800"
                             alt="Writing in notebook" />
@@ -166,7 +168,7 @@
                             alt="Group meeting" />
                     </div>
                 </div>
-                <div class="grid-column">
+                <div class="grid-column" appScrollReveal [delay]="350">
                     <div class="grid-item item--tall">
                         <img src="https://images.unsplash.com/photo-1507842217351-584c7d5270b1?auto=format&fit=crop&q=80&w=800"
                             alt="Library aisle" />
@@ -184,10 +186,10 @@
     <!-- ═══════════════════════════════════════════════
        5. DERNIERS ENGAGEMENTS (AGENDA)
   ═══════════════════════════════════════════════ -->
-    <section class="engagements-section animate-on-scroll">
+    <section class="engagements-section" appScrollReveal>
         <div class="section-container">
 
-            <div class="section-header animate-on-scroll" style="animation-delay: 0.1s">
+            <div class="section-header">
                 <div class="section-heading">
                     <span class="section-eyebrow">— AGENDA</span>
                     <h2>Derniers Engagements</h2>
@@ -203,8 +205,10 @@
             </div>
 
             <div class="engagements-list">
-                <div *ngFor="let event of latestEvents(); let i = index" class="engagement-card animate-on-scroll"
-                    [style.animation-delay]="(0.2 + i * 0.1) + 's'">
+                <div *ngFor="let event of latestEvents(); let i = index" 
+                     class="engagement-card" 
+                     appScrollReveal 
+                     [delay]="200 + (i * 100)">
                     <div class="engagement-card__image">
                         <img [src]="event.coverImage?.url" [alt]="event.title" loading="lazy" />
                     </div>
@@ -239,40 +243,11 @@
     <!-- ═══════════════════════════════════════════════
        6. NEWSLETTER CTA
   ═══════════════════════════════════════════════ -->
-    <section class="newsletter-section animate-on-scroll">
-        <div class="newsletter-inner">
-            <div class="newsletter-content">
-                <h2>Rejoignez le réseau intellectuel</h2>
-                <p>
-                    Abonnez-vous pour recevoir chaque mois des résumés des nouvelles
-                    recherches, des enregistrements d'événements et des recommandations
-                    de livres directement du Dr Mamilo.
-                </p>
-            </div>
-            <div class="newsletter-action-area">
-                <form class="newsletter-form" (submit)="$event.preventDefault()">
-                    <input type="email" placeholder="Entrez votre email académique" class="newsletter-input" />
-                    <button type="submit" class="btn-newsletter">
-                        Rejoindre
-                    </button>
-                </form>
-                <p class="newsletter-privacy">
-                    Nous respectons votre vie privée. Votre adresse ne sera jamais communiquée à des tiers.
-                </p>
-            </div>
-        </div>
-    </section>
+    <app-newsletter></app-newsletter>
 
     <!-- ═══════════════════════════════════════════════
        2. PARTENAIRES MÉDIAS
   ═══════════════════════════════════════════════ -->
-    <section class="partners-section">
-        <div class="partners-inner">
-            <p class="partners-label">RECONNU ET PUBLIÉ PAR</p>
-            <div class="partners-grid">
-                <span *ngFor="let partner of mediaPartners" class="partner-name">{{ partner }}</span>
-            </div>
-        </div>
-    </section>
+    <app-partners></app-partners>
 
 </div>

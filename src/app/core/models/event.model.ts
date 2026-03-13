@@ -23,5 +23,6 @@ export interface Event {
     recap: Post | null;
     coverImage: MediaAsset | null;
     status: 'upcoming' | 'ongoing' | 'past';
+    likesCount: number;
     createdAt: string;
 }

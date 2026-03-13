@@ -1,5 +1,25 @@
+@use "sass:color";
 @use '../../../../styles/abstracts/variables' as *;
 @use '../../../../styles/abstracts/mixins' as *;
+
+.reading-progress {
+    position: fixed;
+    top: 64px; // Fixed below navbar
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba($slate-200, 0.3);
+    z-index: 9998; // Just below navbar z-index (9999)
+    pointer-events: none;
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, $navy 0%, $medium-blue 100%);
+        width: 0%;
+        transition: width 0.1s ease-out;
+        box-shadow: 0 0 10px rgba($navy, 0.3);
+    }
+}
 
 .article-container {
     animation: fadeIn 0.7s ease-in-out forwards;
@@ -42,9 +62,16 @@
             transition: all 0.3s ease;
             @include flex-center;
 
-            &:hover {
-                color: $navy;
+            &.liked {
+                color: #e11d48; // rose-600
                 transform: scale(1.1);
+            }
+
+            .count {
+                font-size: 0.625rem;
+                font-weight: 800;
+                margin-top: 0.15rem;
+                color: $slate-500;
             }
 
             &.bookmark {
@@ -106,7 +133,7 @@
     }
 
     .article-title {
-        font-size: 3rem;
+        font-size: clamp(2.25rem, 8vw, 3.75rem);
         font-weight: 850;
         color: $navy;
         margin-bottom: 1.75rem;
@@ -115,7 +142,7 @@
         letter-spacing: -0.02em;
 
         @include desktop {
-            font-size: 3.75rem;
+            margin-bottom: 2rem;
         }
     }
 
@@ -235,8 +262,8 @@
     border-radius: 0 1rem 1rem 0;
 
     @include mobile {
-        margin: 4rem 0;
-        padding: 2.5rem;
+        margin: 3rem 0;
+        padding: 2rem;
     }
 
     p {
@@ -387,8 +414,13 @@
 .author-card {
     background-color: $slate-50;
     border-radius: 1.5rem;
-    padding: 3.5rem;
-    margin-bottom: 7rem;
+    padding: 2.5rem 1.5rem;
+    margin-bottom: 5rem;
+
+    @include desktop {
+        padding: 3.5rem;
+        margin-bottom: 7rem;
+    }
 
     .author-card-content {
         display: flex;
@@ -402,11 +434,16 @@
         }
 
         .author-card-avatar {
-            width: 10rem;
-            height: 10rem;
+            width: 8rem;
+            height: 8rem;
             border-radius: 1rem;
             object-fit: cover;
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+
+            @include desktop {
+                width: 10rem;
+                height: 10rem;
+            }
         }
 
         .author-card-info {

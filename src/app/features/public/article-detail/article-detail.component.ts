@@ -1,30 +1,39 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID, HostListener, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IContentService } from '../../../core/services/content.interface';
 import { SeoService } from '../../../core/services/seo.service';
 import { Post } from '../../../core/models/post.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { Observable, switchMap, tap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { ContentStore } from '../../../core/services/content-store.service';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule],
   styleUrl: './article-detail.component.scss',
   template: `
     <article *ngIf="post$ | async as post" class="article-container">
+      <!-- Reading Progress Bar -->
+      <div class="reading-progress">
+        <div class="progress-bar" [style.width.%]="readingProgress()"></div>
+      </div>
+
       <!-- Floating Social Sidebar -->
       <aside class="social-sidebar">
         <div class="sidebar-inner">
-          <button class="social-icon" title="Partager sur LinkedIn">
+          <button class="social-icon" (click)="share('linkedin', post)" title="Partager sur LinkedIn">
             <lucide-icon name="linkedin" size="18"></lucide-icon>
           </button>
-          <button class="social-icon" title="Partager sur Twitter">
+          <button class="social-icon" (click)="share('twitter', post)" title="Partager sur Twitter">
             <lucide-icon name="twitter" size="18"></lucide-icon>
           </button>
-          <button class="social-icon" title="Enregistrer">
-            <lucide-icon name="share-2" size="18"></lucide-icon>
+          <button class="social-icon" (click)="onLike(post.id)" [class.liked]="hasLiked()" title="J'aime">
+            <lucide-icon name="heart" [class.fill]="hasLiked()" size="18"></lucide-icon>
+            <span class="count" *ngIf="post.likesCount">{{ post.likesCount }}</span>
           </button>
           <div class="divider"></div>
           <button class="social-icon bookmark" title="Sauvegarder">
@@ -48,7 +57,7 @@ import { Observable, switchMap, tap } from 'rxjs';
           <p class="article-subtitle">{{ post.excerpt }}</p>
 
           <div class="author-meta">
-            <img [src]="post.author.avatar.url" class="author-avatar" [alt]="post.author.name">
+            <img [src]="post.author.avatar.url" class="author-avatar" [alt]="post.author.name" loading="eager" decoding="async" fetchpriority="high">
             <div class="meta-info">
               <span class="author-name">Par {{ post.author.name }}</span>
               <div class="sub-meta">
@@ -67,6 +76,7 @@ import { Observable, switchMap, tap } from 'rxjs';
           [src]="post.coverImage.url" 
           [alt]="post.coverImage.alt"
           class="featured-image"
+          loading="lazy" decoding="async"
         >
         <p class="image-caption">Image : La pédagogie inversée en université, un levier pour l'engagement étudiant.</p>
       </div>
@@ -104,7 +114,7 @@ import { Observable, switchMap, tap } from 'rxjs';
 
         <!-- Tags Section -->
         <div class="tags-section">
-          <a *ngFor="let tag of post.tags" [routerLink]="['/articles']" [queryParams]="{tag: tag.name}" class="tag-btn">
+          <a *ngFor="let tag of post.tags; trackBy: trackByTag" [routerLink]="['/articles']" [queryParams]="{tag: tag.name}" class="tag-btn">
             {{ tag.name }}
           </a>
         </div>
@@ -130,21 +140,21 @@ import { Observable, switchMap, tap } from 'rxjs';
           </div>
           <div class="related-grid">
             <div class="related-card">
-              <img src="assets/images/mock/article1.jpg" alt="Article 1" class="card-img">
+              <img src="assets/images/mock/article1.jpg" alt="Article 1" class="card-img" loading="lazy" decoding="async">
               <div class="card-content">
                 <span class="card-category">Technologie</span>
                 <h4 class="card-title">L'avenir de l'évaluation par les pairs</h4>
               </div>
             </div>
             <div class="related-card">
-              <img src="assets/images/mock/article2.jpg" alt="Article 2" class="card-img">
+              <img src="assets/images/mock/article2.jpg" alt="Article 2" class="card-img" loading="lazy" decoding="async">
               <div class="card-content">
                 <span class="card-category">Éthique</span>
                 <h4 class="card-title">Protection des données de la recherche</h4>
               </div>
             </div>
             <div class="related-card">
-              <img src="assets/images/mock/article3.jpg" alt="Article 3" class="card-img">
+              <img src="assets/images/mock/article3.jpg" alt="Article 3" class="card-img" loading="lazy" decoding="async">
               <div class="card-content">
                 <span class="card-category">Gouvernance</span>
                 <h4 class="card-title">Souveraineté académique à l'ère du Big Data</h4>
@@ -155,28 +165,31 @@ import { Observable, switchMap, tap } from 'rxjs';
 
         <!-- Discussions -->
         <section class="discussion-section">
-          <h2 class="discussion-title"><lucide-icon name="message-square" size="20"></lucide-icon> Discussions (4)</h2>
+          <h2 class="discussion-title"><lucide-icon name="message-square" size="20"></lucide-icon> Discussions ({{ post.comments.length }})</h2>
           <div class="comment-input-area">
-            <img [src]="post.author.avatar.url" class="current-user-avatar" alt="User">
+            <img [src]="'assets/images/mock/avatar.jpg'" class="current-user-avatar" alt="User">
             <div class="input-wrapper">
-              <textarea placeholder="Contribuez au discours académique..."></textarea>
+              <textarea [(ngModel)]="newComment" placeholder="Contribuez au discours académique..."></textarea>
               <div class="input-footer">
                 <p class="char-info">Votre message sera soumis à la modération avant publication.</p>
-                <button class="submit-btn">Publier un commentaire</button>
+                <button class="submit-btn" (click)="onSubmitComment(post.id)" [disabled]="!newComment.trim()">Publier un commentaire</button>
               </div>
             </div>
           </div>
           <div class="comments-list">
-             <!-- Mock comments -->
-             <div class="comment-item">
-               <img src="assets/images/mock/avatar.jpg" class="comment-avatar" alt="Dr. Claire Morel">
+             <div *ngFor="let comment of post.comments; trackBy: trackByComment" class="comment-item" appScrollReveal>
+               <img [src]="comment.authorAvatar" class="comment-avatar" [alt]="comment.authorName">
                <div class="comment-content">
                  <div class="comment-header">
-                   <h4 class="comment-author">Dr. Claire Morel</h4>
-                   <span class="comment-date">Il y a 2 jours</span>
+                   <h4 class="comment-author">{{ comment.authorName }}</h4>
+                   <span class="comment-date">{{ comment.createdAt | date:'shortDate' }}</span>
                  </div>
-                 <p class="comment-text">Cet article soulève des points cruciaux. La visibilité ne doit pas primer sur la qualité intrinsèque des travaux. Bravo pour cette analyse.</p>
+                 <p class="comment-text">{{ comment.content }}</p>
                </div>
+             </div>
+
+             <div *ngIf="!post.comments.length" class="no-comments">
+               Soyez le premier à contribuer à cette discussion académique.
              </div>
           </div>
         </section>
@@ -186,10 +199,16 @@ import { Observable, switchMap, tap } from 'rxjs';
 })
 export class ArticleDetailComponent implements OnInit {
   private contentService = inject(IContentService);
+  private contentStore = inject(ContentStore);
   private seoService = inject(SeoService);
   private route = inject(ActivatedRoute);
+  private platformId = inject(PLATFORM_ID);
 
   post$!: Observable<Post | null>;
+  readingProgress = signal(0);
+  newComment = '';
+  hasLiked = signal(false);
+  private isBrowser = isPlatformBrowser(this.platformId);
 
   ngOnInit(): void {
     this.post$ = this.route.params.pipe(
@@ -202,11 +221,54 @@ export class ArticleDetailComponent implements OnInit {
             title: post.seo.ogTitle,
             description: post.seo.ogDescription,
             image: post.seo.ogImage,
-            url: window.location.href
+            url: this.isBrowser ? window.location.href : ''
           });
           this.seoService.generateStructuredData(post);
         }
       })
     );
   }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (this.isBrowser) {
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const currentScroll = window.scrollY;
+      this.readingProgress.set((currentScroll / scrollHeight) * 100);
+    }
+  }
+
+  onLike(id: string) {
+    if (this.hasLiked()) return;
+    this.contentStore.likePost(id).subscribe(() => {
+      this.hasLiked.set(true);
+    });
+  }
+
+  onSubmitComment(postId: string) {
+    if (!this.newComment.trim()) return;
+    this.contentStore.addComment(postId, this.newComment.trim()).subscribe(() => {
+      this.newComment = '';
+    });
+  }
+
+  share(platform: string, post: Post) {
+    if (!this.isBrowser) return;
+    const url = window.location.href;
+    const text = encodeURIComponent(post.title);
+    let shareUrl = '';
+
+    if (platform === 'linkedin') {
+      shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    } else if (platform === 'twitter') {
+      shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+  }
+
+  trackByTag(_: number, tag: any) { return tag.name; }
+  trackByComment(_: number, comment: any) { return comment.id; }
 }

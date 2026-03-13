@@ -1,16 +1,20 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Mail, Globe, Clock, Phone, MapPin, ArrowRight, ChevronRight } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 import { SeoService } from '../../../core/services/seo.service';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ScrollRevealDirective } from '../../../shared/directives/scroll-reveal.directive';
+import { NewsletterComponent } from '../../../shared/components/newsletter.component';
 
 @Component({
     selector: 'app-contact',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, LucideAngularModule, ReactiveFormsModule, ScrollRevealDirective, NewsletterComponent],
     template: `
     <div class="contact-page">
       <!-- 1. HERO SECTION -->
-      <header class="contact-hero">
+      <header class="contact-hero" appScrollReveal>
         <div class="container">
           <h1>Se connecter pour <span>collaborer</span></h1>
           <p class="hero-subtitle">
@@ -26,41 +30,54 @@ import { SeoService } from '../../../core/services/seo.service';
         <div class="container contact-grid">
           
           <!-- LEFT COLUMN: FORM -->
-          <div class="contact-column-left">
-            <div class="form-wrapper">
-              <h3>Formulaire de demande</h3>
-              <p class="form-desc">Veuillez utiliser le formulaire ci-dessous pour les collaborations académiques, les interventions publiques ou les demandes de renseignements des étudiants.</p>
-              
-              <form class="contact-form" (submit)="$event.preventDefault()">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Nom et prénom</label>
-                    <input type="text" placeholder="John Doe">
+          <div class="contact-column-left" appScrollReveal [delay]="200">
+            <div class="form-wrapper" [class.is-submitted]="submitted()">
+              <ng-container *ngIf="!submitted(); else successMessage">
+                <h3>Formulaire de demande</h3>
+                <p class="form-desc">Veuillez utiliser le formulaire ci-dessous pour les collaborations académiques, les interventions publiques ou les demandes de renseignements des étudiants.</p>
+                
+                <form class="contact-form" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Nom et prénom</label>
+                      <input type="text" formControlName="name" placeholder="John Doe" [class.error]="isFieldInvalid('name')">
+                    </div>
+                    <div class="form-group">
+                      <label>Adresse email</label>
+                      <input type="email" formControlName="email" placeholder="j.doe@university.edu" [class.error]="isFieldInvalid('email')">
+                    </div>
                   </div>
+                  
                   <div class="form-group">
-                    <label>Adresse email</label>
-                    <input type="email" placeholder="j.doe@university.edu">
+                    <label>Sujet</label>
+                    <input type="text" formControlName="subject" placeholder="Collaboration académique / Recherche orale" [class.error]="isFieldInvalid('subject')">
                   </div>
+                  
+                  <div class="form-group">
+                    <label>Votre message</label>
+                    <textarea formControlName="message" placeholder="Description détaillée de votre demande..." [class.error]="isFieldInvalid('message')"></textarea>
+                  </div>
+                  
+                  <button type="submit" class="btn-submit" [disabled]="contactForm.invalid">
+                    Soumettre
+                    <lucide-icon name="arrow-right" size="18"></lucide-icon>
+                  </button>
+                </form>
+              </ng-container>
+
+              <ng-template #successMessage>
+                <div class="success-state" appScrollReveal>
+                  <div class="success-icon">
+                    <lucide-icon name="check" size="48"></lucide-icon>
+                  </div>
+                  <h3>Message envoyé avec succès</h3>
+                  <p>Merci pour votre intérêt. Je reviendrai vers vous dans les meilleurs délais selon les normes de réponse indiquées.</p>
+                  <button class="btn-primary" (click)="resetForm()">Envoyer un autre message</button>
                 </div>
-                
-                <div class="form-group">
-                  <label>Sujet</label>
-                  <input type="text" placeholder="Collaboration académique / Recherche orale">
-                </div>
-                
-                <div class="form-group">
-                  <label>Votre message</label>
-                  <textarea placeholder="Description détaillée de votre demande..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit">
-                  Soumettre
-                  <lucide-icon name="arrow-right" size="18"></lucide-icon>
-                </button>
-              </form>
+              </ng-template>
             </div>
             
-            <div class="response-norms">
+            <div class="response-norms" appScrollReveal [delay]="400">
               <div class="norms-header">
                 <lucide-icon name="mail" size="18"></lucide-icon>
                 <h3>Normes de réponse</h3>
@@ -74,7 +91,7 @@ import { SeoService } from '../../../core/services/seo.service';
           </div>
           
           <!-- RIGHT COLUMN: INFO -->
-          <div class="contact-column-right">
+          <div class="contact-column-right" appScrollReveal [delay]="300">
             <div class="info-section">
               <h3>Portée directe</h3>
               
@@ -124,7 +141,7 @@ import { SeoService } from '../../../core/services/seo.service';
               </div>
             </div>
             
-            <div class="location-section">
+            <div class="location-section" appScrollReveal [delay]="450">
               <h3>Emplacement du campus</h3>
               <div class="map-placeholder">
                 <div class="map-card">
@@ -148,25 +165,46 @@ import { SeoService } from '../../../core/services/seo.service';
       </section>
 
       <!-- 3. NEWSLETTER SECTION -->
-      <section class="newsletter-footer">
-        <div class="container center-content">
-          <h2>Restez informé grâce aux analyses</h2>
-          <p>Rejoignez le réseau académique pour recevoir des résumés trimestriels des découvertes scientifiques et des séminaires à venir.</p>
-          
-          <div class="newsletter-form-inline">
-            <input type="email" placeholder="Entrez votre email">
-            <button class="btn-subscribe">S'abonner</button>
-          </div>
-        </div>
-      </section>
+      <app-newsletter></app-newsletter>
     </div>
   `,
     styleUrl: './contact.component.scss'
 })
 export class ContactComponent implements OnInit {
     private seoService = inject(SeoService);
+    private fb = inject(FormBuilder);
+    
+    contactForm!: FormGroup;
+    submitted = signal(false);
 
     ngOnInit(): void {
         this.seoService.updateTitle('Contact & Collaboration');
+        this.initForm();
+    }
+
+    private initForm(): void {
+        this.contactForm = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(3)]],
+            email: ['', [Validators.required, Validators.email]],
+            subject: ['', [Validators.required]],
+            message: ['', [Validators.required, Validators.minLength(10)]]
+        });
+    }
+
+    isFieldInvalid(fieldName: string): boolean {
+        const field = this.contactForm.get(fieldName);
+        return !!(field && field.invalid && (field.dirty || field.touched));
+    }
+
+    onSubmit(): void {
+        if (this.contactForm.valid) {
+            console.log('Form Submitted', this.contactForm.value);
+            this.submitted.set(true);
+        }
+    }
+
+    resetForm(): void {
+        this.contactForm.reset();
+        this.submitted.set(false);
     }
 }

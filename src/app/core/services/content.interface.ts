@@ -45,4 +45,9 @@ export abstract class IContentService {
 
     abstract getSettings(): Observable<SiteSettings>;
     abstract updateSettings(settings: Partial<SiteSettings>): Observable<SiteSettings>;
+
+    // Social actions
+    abstract likePost(id: string): Observable<number>;
+    abstract likeEvent(id: string): Observable<number>;
+    abstract addComment(postId: string, comment: any): Observable<any>;
 }

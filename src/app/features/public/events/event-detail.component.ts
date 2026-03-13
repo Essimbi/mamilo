@@ -1,15 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IContentService } from '../../../core/services/content.interface';
 import { SeoService } from '../../../core/services/seo.service';
 import { Event } from '../../../core/models/event.model';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Heart, ChevronLeft, MapPin, Calendar, Clock, LayoutGrid, Check, BookOpen, ArrowRight } from 'lucide-angular';
 import { Observable, switchMap, tap } from 'rxjs';
+import { ContentStore } from '../../../core/services/content-store.service';
 
 @Component({
    selector: 'app-event-detail',
    standalone: true,
+   changeDetection: ChangeDetectionStrategy.OnPush,
    imports: [CommonModule, RouterModule, LucideAngularModule],
    styleUrl: './event-detail.component.scss',
    template: `
@@ -26,20 +28,12 @@ import { Observable, switchMap, tap } from 'rxjs';
           
           <h1 class="hero-title">{{ event.title }}</h1>
           
-          <div class="hero-meta">
-            <div class="meta-item">
-              <lucide-icon name="calendar" size="18"></lucide-icon>
-              <span>{{ event.startDate | date:'MMMM dd, yyyy' }}</span>
-            </div>
-            <div class="meta-item">
-              <lucide-icon name="clock" size="18"></lucide-icon>
-              <span>{{ event.startDate | date:'HH:mm' }} — {{ event.endDate | date:'HH:mm' }} (GMT)</span>
-            </div>
-            <div class="meta-item">
-              <lucide-icon name="map-pin" size="18"></lucide-icon>
-              <span>{{ event.location.venue }}, {{ event.location.city }}</span>
-            </div>
-          </div>
+           <div class="hero-actions">
+              <button class="hero-like-btn" (click)="onLike(event.id)" [class.liked]="hasLiked()">
+                <lucide-icon name="heart" [class.fill]="hasLiked()" size="18"></lucide-icon>
+                <span>{{ event.likesCount }} intéressés</span>
+              </button>
+           </div>
         </div>
       </section>
 
@@ -81,8 +75,8 @@ import { Observable, switchMap, tap } from 'rxjs';
               
               <div class="speakers-grid">
                 <!-- Mock Speakers - In a real app these would come from the model -->
-                <div class="speaker-card" *ngFor="let i of [1,2,3,4,5,6]">
-                  <img src="assets/images/mock/avatar.jpg" class="speaker-img" alt="Speaker">
+                <div class="speaker-card" *ngFor="let i of [1,2,3,4,5,6]; trackBy: trackByIndex">
+                  <img src="assets/images/mock/avatar.jpg" class="speaker-img" alt="Speaker" loading="lazy" decoding="async">
                   <h4 class="speaker-name">Dr. Elena Rossi</h4>
                   <p class="speaker-title">Professor of Digital Ethics</p>
                   <p class="speaker-org">University of Bologna</p>
@@ -97,13 +91,13 @@ import { Observable, switchMap, tap } from 'rxjs';
               
               <div class="gallery-layout">
                 <div class="gallery-main">
-                  <img src="https://images.unsplash.com/photo-1540575861501-7ad058211a37?auto=format&fit=crop&q=80&w=1000" class="gallery-img" alt="Conference Main">
+                  <img src="https://images.unsplash.com/photo-1540575861501-7ad058211a37?auto=format&fit=crop&q=80&w=1000" class="gallery-img" alt="Conference Main" loading="lazy" decoding="async">
                 </div>
                 <div class="gallery-side">
-                  <img src="https://images.unsplash.com/photo-1528605248644-14dd04122c1e?auto=format&fit=crop&q=80&w=600" class="gallery-img" alt="Highlight 1">
+                  <img src="https://images.unsplash.com/photo-1528605248644-14dd04122c1e?auto=format&fit=crop&q=80&w=600" class="gallery-img" alt="Highlight 1" loading="lazy" decoding="async">
                   <div class="gallery-bottom-row">
-                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=400" class="gallery-img" alt="Highlight 2">
-                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=400" class="gallery-img" alt="Highlight 3">
+                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=400" class="gallery-img" alt="Highlight 2" loading="lazy" decoding="async">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=400" class="gallery-img" alt="Highlight 3" loading="lazy" decoding="async">
                   </div>
                 </div>
               </div>
@@ -142,7 +136,7 @@ import { Observable, switchMap, tap } from 'rxjs';
             <div class="related-events-box">
               <h4 class="related-title"><lucide-icon name="book-open" size="18"></lucide-icon> Événements connexes</h4>
               <div class="related-list">
-                <div class="related-item" *ngFor="let i of [1,2,3]">
+                <div class="related-item" *ngFor="let i of [1,2,3]; trackBy: trackByIndex">
                   <div class="date-mini">
                     <span class="mini-month">SEP</span>
                     <span class="mini-day">12</span>
@@ -163,10 +157,12 @@ import { Observable, switchMap, tap } from 'rxjs';
 })
 export class EventDetailComponent implements OnInit {
    private contentService = inject(IContentService);
+   private contentStore = inject(ContentStore);
    private seoService = inject(SeoService);
    private route = inject(ActivatedRoute);
 
    event$!: Observable<Event | null>;
+   hasLiked = signal(false);
 
    ngOnInit(): void {
       this.event$ = this.route.params.pipe(
@@ -179,4 +175,13 @@ export class EventDetailComponent implements OnInit {
          })
       );
    }
+
+   onLike(id: string) {
+      if (this.hasLiked()) return;
+      this.contentStore.likeEvent(id).subscribe(() => {
+         this.hasLiked.set(true);
+      });
+   }
+
+   trackByIndex(index: number) { return index; }
 }

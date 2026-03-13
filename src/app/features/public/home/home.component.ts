@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener, AfterViewInit, ElementRef, PLATFORM_ID, Inject, computed } from '@angular/core';
+import { Component, OnInit, inject, HostListener, AfterViewInit, ElementRef, PLATFORM_ID, Inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GlobalStateService } from '../../../core/services/global-state.service';
@@ -8,17 +8,21 @@ import { Event } from '../../../core/models/event.model';
 import { MOCK_USER } from '../../../mock-data/data/users.mock';
 import { LucideAngularModule } from 'lucide-angular';
 
+import { ScrollRevealDirective } from '../../../shared/directives/scroll-reveal.directive';
+import { NewsletterComponent } from '../../../shared/components/newsletter.component';
+import { PartnersComponent } from '../../../shared/components/partners.component';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, LucideAngularModule, ScrollRevealDirective, NewsletterComponent, PartnersComponent],
   styleUrl: './home.component.scss',
   templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
   private state = inject(GlobalStateService);
   private seoService = inject(SeoService);
-  private elementRef = inject(ElementRef);
   private isBrowser: boolean;
 
   featuredPost = computed(() => this.state.posts()[0]);
@@ -39,13 +43,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     'Consulting & formations sur mesure'
   ];
 
-  mediaPartners = [
-    'Cambridge Press',
-    'The Economist',
-    'MIT Technology Review',
-    'Oxford University',
-    'Sage Journals'
-  ];
 
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -58,35 +55,5 @@ export class HomeComponent implements OnInit, AfterViewInit {
       s?.siteDescription || 'Plateforme éditoriale du Dr. Christian Mamilo. Communication digitale et perspectives académiques.',
       s?.keywords || ['communication', 'digital', 'académique', 'expertise']
     );
-  }
-
-  ngAfterViewInit(): void {
-    // Only run animations in browser environment
-    if (this.isBrowser) {
-      setTimeout(() => this.checkScrollAnimations(), 100);
-    }
-  }
-
-  @HostListener('window:scroll')
-  onScroll(): void {
-    if (this.isBrowser) {
-      this.checkScrollAnimations();
-    }
-  }
-
-  private checkScrollAnimations(): void {
-    if (!this.isBrowser) return;
-
-    const elements = this.elementRef.nativeElement.querySelectorAll('.animate-on-scroll');
-    const windowHeight = window.innerHeight;
-
-    elements.forEach((element: HTMLElement) => {
-      const elementTop = element.getBoundingClientRect().top;
-      const elementVisible = 150; // Distance from bottom of viewport to trigger animation
-
-      if (elementTop < windowHeight - elementVisible) {
-        element.classList.add('animated');
-      }
-    });
   }
 }

@@ -13,6 +13,9 @@ export class ContentStore {
     private contentService = inject(IContentService);
     private state = inject(GlobalStateService);
 
+    /** Simple in-memory cache — survives SPA navigation, cleared on write */
+    private cache = new Map<string, any>();
+
     loadAllInitialData() {
         this.state.setLoading(true);
 
@@ -27,45 +30,96 @@ export class ContentStore {
     }
 
     private loadPosts() {
+        if (this.cache.has('posts')) {
+            this.state.setPosts(this.cache.get('posts'));
+            return;
+        }
         this.contentService.getPosts().pipe(
-            tap(res => this.state.setPosts(res.items)),
+            tap(res => {
+                this.cache.set('posts', res.items);
+                this.state.setPosts(res.items);
+            }),
             catchError(() => of({ items: [] }))
         ).subscribe();
     }
 
     private loadEvents() {
+        if (this.cache.has('events')) {
+            this.state.setEvents(this.cache.get('events'));
+            return;
+        }
         this.contentService.getEvents().pipe(
-            tap(events => this.state.setEvents(events)),
+            tap(events => {
+                this.cache.set('events', events);
+                this.state.setEvents(events);
+            }),
             catchError(() => of([]))
         ).subscribe();
     }
 
     private loadMedia() {
+        if (this.cache.has('media')) {
+            this.state.setMedia(this.cache.get('media'));
+            return;
+        }
         this.contentService.getMedia().pipe(
-            tap(media => this.state.setMedia(media)),
+            tap(media => {
+                this.cache.set('media', media);
+                this.state.setMedia(media);
+            }),
             catchError(() => of([]))
         ).subscribe();
     }
 
     private loadProfile() {
+        if (this.cache.has('profile')) {
+            this.state.setUser(this.cache.get('profile'));
+            return;
+        }
         this.contentService.getProfile().pipe(
-            tap(profile => this.state.setUser(profile)),
+            tap(profile => {
+                this.cache.set('profile', profile);
+                this.state.setUser(profile);
+            }),
             catchError(() => of(null as any))
         ).subscribe();
     }
 
     private loadCategories() {
+        if (this.cache.has('categories')) {
+            this.state.setCategories(this.cache.get('categories'));
+            return;
+        }
         this.contentService.getCategories().pipe(
-            tap(categories => this.state.setCategories(categories)),
+            tap(categories => {
+                this.cache.set('categories', categories);
+                this.state.setCategories(categories);
+            }),
             catchError(() => of([]))
         ).subscribe();
     }
 
     private loadSettings() {
+        if (this.cache.has('settings')) {
+            this.state.setSettings(this.cache.get('settings'));
+            return;
+        }
         this.contentService.getSettings().pipe(
-            tap(settings => this.state.setSettings(settings)),
+            tap(settings => {
+                this.cache.set('settings', settings);
+                this.state.setSettings(settings);
+            }),
             catchError(() => of(null))
         ).subscribe();
+    }
+
+    /** Call after any write to invalidate affected cache entries */
+    clearCache(...keys: string[]) {
+        if (keys.length === 0) {
+            this.cache.clear();
+        } else {
+            keys.forEach(k => this.cache.delete(k));
+        }
     }
 
     // --- Post CRUD ---
@@ -73,6 +127,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.createPost(post).pipe(
             tap(newPost => {
+                this.clearCache('posts');
                 this.state.setPosts([newPost, ...this.state.posts()]);
                 this.state.setLoading(false);
             }),
@@ -88,6 +143,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.updatePost(id, post).pipe(
             tap(updatedPost => {
+                this.clearCache('posts');
                 const currentPosts = this.state.posts();
                 const index = currentPosts.findIndex(p => p.id === id);
                 if (index !== -1) {
@@ -110,6 +166,7 @@ export class ContentStore {
         return this.contentService.deletePost(id).pipe(
             tap(success => {
                 if (success) {
+                    this.clearCache('posts');
                     this.state.setPosts(this.state.posts().filter(p => p.id !== id));
                 }
                 this.state.setLoading(false);
@@ -127,6 +184,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.createEvent(event).pipe(
             tap(newEvent => {
+                this.clearCache('events');
                 this.state.setEvents([newEvent, ...this.state.events()]);
                 this.state.setLoading(false);
             })
@@ -137,6 +195,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.updateEvent(id, event).pipe(
             tap(updatedEvent => {
+                this.clearCache('events');
                 const current = this.state.events();
                 const index = current.findIndex(e => e.id === id);
                 if (index !== -1) {
@@ -153,7 +212,10 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.deleteEvent(id).pipe(
             tap(success => {
-                if (success) this.state.setEvents(this.state.events().filter(e => e.id !== id));
+                if (success) {
+                    this.clearCache('events');
+                    this.state.setEvents(this.state.events().filter(e => e.id !== id));
+                }
                 this.state.setLoading(false);
             })
         );
@@ -164,6 +226,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.uploadMedia(asset).pipe(
             tap(newAsset => {
+                this.clearCache('media');
                 this.state.setMedia([newAsset, ...this.state.media()]);
                 this.state.setLoading(false);
             })
@@ -174,7 +237,10 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.deleteMedia(id).pipe(
             tap(success => {
-                if (success) this.state.setMedia(this.state.media().filter(m => m.id !== id));
+                if (success) {
+                    this.clearCache('media');
+                    this.state.setMedia(this.state.media().filter(m => m.id !== id));
+                }
                 this.state.setLoading(false);
             })
         );
@@ -185,6 +251,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.updateProfile(user).pipe(
             tap(updated => {
+                this.clearCache('profile');
                 this.state.setUser(updated);
                 this.state.setLoading(false);
             })
@@ -196,6 +263,7 @@ export class ContentStore {
         this.state.setLoading(true);
         return this.contentService.updateSettings(settings).pipe(
             tap(updated => {
+                this.clearCache('settings');
                 this.state.setSettings(updated);
                 this.state.setLoading(false);
             }),
@@ -203,6 +271,56 @@ export class ContentStore {
                 this.state.setError(err.message);
                 this.state.setLoading(false);
                 throw err;
+            })
+        );
+    }
+
+    // --- Social Actions ---
+    likePost(id: string) {
+        return this.contentService.likePost(id).pipe(
+            tap(newCount => {
+                const posts = this.state.posts();
+                const index = posts.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    const newPosts = [...posts];
+                    newPosts[index] = { ...newPosts[index], likesCount: newCount };
+                    this.state.setPosts(newPosts);
+                }
+            })
+        );
+    }
+
+    likeEvent(id: string) {
+        return this.contentService.likeEvent(id).pipe(
+            tap(newCount => {
+                const events = this.state.events();
+                const index = events.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    const newEvents = [...events];
+                    newEvents[index] = { ...newEvents[index], likesCount: newCount };
+                    this.state.setEvents(newEvents);
+                }
+            })
+        );
+    }
+
+    addComment(postId: string, comment: string) {
+        const author = this.state.user();
+        return this.contentService.addComment(postId, {
+            content: comment,
+            authorName: author?.name || 'Visiteur Académique',
+            authorAvatar: author?.avatar?.url || 'assets/images/mock/avatar.jpg'
+        }).pipe(
+            tap(newComment => {
+                const posts = this.state.posts();
+                const index = posts.findIndex(p => p.id === postId);
+                if (index !== -1) {
+                    const newPosts = [...posts];
+                    const updatedPost = { ...newPosts[index] };
+                    updatedPost.comments = [...(updatedPost.comments || []), newComment];
+                    newPosts[index] = updatedPost;
+                    this.state.setPosts(newPosts);
+                }
             })
         );
     }

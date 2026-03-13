@@ -7,6 +7,16 @@ import { SeoMeta } from './seo.model';
 export type PostType = 'article' | 'note' | 'recap';
 export type PostStatus = 'draft' | 'published' | 'scheduled' | 'archived';
 
+export interface Comment {
+    id: string;
+    postId: string;
+    authorName: string;
+    authorAvatar: string;
+    content: string;
+    createdAt: string;
+    isApproved: boolean;
+}
+
 export interface Post {
     id: string;
     title: string;
@@ -16,6 +26,8 @@ export interface Post {
     excerpt: string;
     content: string;
     readingTime: number;
+    likesCount: number;
+    comments: Comment[];
     coverImage: MediaAsset | null;
     author: User;
     category: Category;

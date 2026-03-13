@@ -14,6 +14,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Comment la digitalisation redéfinit la transmission du savoir et les structures de recherche au XXIe siècle.',
         content: '<p>L\'intégration des outils numériques dans l\'enseignement supérieur ne se limite pas à la mise en ligne de cours. C\'est une mutation profonde...</p>',
         readingTime: 8,
+        likesCount: 124,
+        comments: [],
         coverImage: {
             id: 'img-1',
             url: 'https://images.unsplash.com/photo-1523240715632-d984bb4b974c?auto=format&fit=crop&q=80&w=1000',
@@ -53,6 +55,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Exploration de l\'utilisation de l\'analyse de données en temps réel pour gérer la réputation institutionnelle.',
         content: '<p>En période de crise, chaque seconde compte. La data devient alors le meilleur allié du communicateur stratégique...</p>',
         readingTime: 12,
+        likesCount: 89,
+        comments: [],
         coverImage: {
             id: 'img-2',
             url: 'https://images.unsplash.com/photo-1551288049-bbbda5366391?auto=format&fit=crop&q=80&w=1000',
@@ -92,6 +96,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Courte réflexion sur la neutralité supposée des algorithmes de recommandation sociale.',
         content: '<p>Il est urgent de déconstruire le mythe de la neutralité technique. Derrière chaque algorithme se cache un choix politique...</p>',
         readingTime: 4,
+        likesCount: 45,
+        comments: [],
         coverImage: {
             id: 'img-3',
             url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000',
@@ -131,6 +137,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Synthèse des trois jours de débats sur le futur du journalisme et des médias publics.',
         content: '<p>Le Forum de cette année a mis en lumière trois enjeux majeurs : le financement du service public, la lutte contre les fake news...</p>',
         readingTime: 6,
+        likesCount: 32,
+        comments: [],
         coverImage: {
             id: 'img-4',
             url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=1000',
@@ -170,6 +178,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Comment optimiser sa présence en ligne sans perdre son authenticité grâce à l\'intelligence artificielle.',
         content: '<p>Le personal branding n\'est plus une option pour l\'expert contemporain. L\'IA offre des outils d\'automatisation précieux...</p>',
         readingTime: 10,
+        likesCount: 67,
+        comments: [],
         coverImage: {
             id: 'img-5',
             url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=1000',
@@ -209,6 +219,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Reflexions sur le passage du papier au flux continu d\'information numérique.',
         content: '<p>Le journal n\'est plus un objet physique, c\'est un flux constant. Cette transition n\'est pas sans consequence sur la qualite...</p>',
         readingTime: 5,
+        likesCount: 28,
+        comments: [],
         coverImage: {
             id: 'img-6',
             url: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1000',
@@ -248,6 +260,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Comment les sciences du langage informent le développement des modèles de langage à grande échelle (LLM).',
         content: '<p>L\'analyse sémantique n\'a jamais été aussi importante qu\'à l\'heure où nous déléguons la production de texte à des machines...</p>',
         readingTime: 15,
+        likesCount: 156,
+        comments: [],
         coverImage: {
             id: 'img-7',
             url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=1000',
@@ -287,6 +301,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Points clés de mon intervention sur l\'adaptation des modèles occidentaux au contexte local.',
         content: '<p>Intervenir à Douala m\'a permis de confronter mes théories à la réalité vibrante du marché camerounais...</p>',
         readingTime: 7,
+        likesCount: 41,
+        comments: [],
         coverImage: {
             id: 'img-8',
             url: 'https://images.unsplash.com/photo-1528605248644-14dd04cb11c1?auto=format&fit=crop&q=80&w=1000',
@@ -326,6 +342,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Brouillon d\'une étude sur la pérennité des modèles d\'apprentissage mixtes après la pandémie.',
         content: '<p>Nous sommes à un tournant. Le tout distanciel a montré ses limites, mais le retour au 100% présentiel est impossible...</p>',
         readingTime: 10,
+        likesCount: 0,
+        comments: [],
         coverImage: {
             id: 'img-9',
             url: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=1000',
@@ -365,6 +383,8 @@ export const MOCK_POSTS: Post[] = [
         excerpt: 'Comment les plateformes numériques redéfinissent l\'espace public et le débat politique sur le continent.',
         content: '<p>De Dakar à Nairobi, les réseaux sociaux sont devenus le nouveau champ de bataille des idées politiques...</p>',
         readingTime: 14,
+        likesCount: 73,
+        comments: [],
         coverImage: {
             id: 'img-10',
             url: 'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&q=80&w=1000',

@@ -51,7 +51,7 @@ $gold-light: #e6c96a;
     z-index: 1;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 4rem;
+    gap: 3rem;
     align-items: center;
 
     @include desktop {
@@ -71,18 +71,32 @@ $gold-light: #e6c96a;
         background: rgba(#4a90c4, 0.08);
         padding: 0.5rem 1.25rem;
         border-radius: 100px;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
         text-transform: uppercase;
+
+        @include mobile {
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @include desktop {
+            margin-bottom: 2.5rem;
+        }
     }
 
     h1 {
         font-family: $font-display;
-        font-size: clamp(1.5rem, 5vw, 4rem);
+        font-size: clamp(2rem, 5vw, 4rem);
         font-weight: 700;
         line-height: 1.05;
         color: #1a1a1a;
         margin-bottom: 1.5rem;
         letter-spacing: -0.02em;
+
+        @include mobile {
+            text-align: center;
+        }
 
         .hero-title-accent {
             display: block;
@@ -94,16 +108,30 @@ $gold-light: #e6c96a;
         font-size: 1.125rem;
         line-height: 1.8;
         color: #64748b;
-        margin-bottom: 3rem;
+        margin-bottom: 2.5rem;
         max-width: 36rem;
         font-weight: 400;
+
+        @include mobile {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 
     .hero-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
-        margin-bottom: 5rem;
+        margin-bottom: 3rem;
+
+        @include mobile {
+            justify-content: center;
+        }
+        
+        @include desktop {
+             margin-bottom: 5rem;
+        }
 
         .btn-primary {
             padding: 1rem 2rem;
@@ -144,9 +172,19 @@ $gold-light: #e6c96a;
 .hero-stats {
     display: flex;
     align-items: center;
-    gap: 3.5rem;
+    gap: 2rem;
     padding-top: 0;
     border-top: none;
+
+    @include mobile {
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    @include desktop {
+        gap: 3.5rem;
+    }
 
     .stat-item {
         display: flex;
@@ -279,53 +317,6 @@ $gold-light: #e6c96a;
 // ═══════════════════════════════════════════════════════════════
 // 2. PARTENAIRES
 // ═══════════════════════════════════════════════════════════════
-.partners-section {
-    padding: 4rem 0;
-    background-color: #ffffff;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-
-    .partners-inner {
-        @include container;
-        display: flex;
-        align-items: center;
-        gap: 3rem;
-        flex-wrap: wrap;
-
-        @include desktop {
-            justify-content: space-between;
-        }
-    }
-
-    .partners-label {
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-    }
-
-    .partners-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2.5rem 4rem;
-        align-items: center;
-
-        .partner-name {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #cbd5e1;
-            font-family: $font-display;
-            letter-spacing: 0.02em;
-            transition: color 0.3s ease;
-
-            &:hover {
-                color: #94a3b8;
-            }
-        }
-    }
-}
 
 // ═══════════════════════════════════════════════════════════════
 // 3. ARTICLES EN VEDETTE
@@ -486,7 +477,7 @@ $gold-light: #e6c96a;
         @include container;
         display: grid;
         grid-template-columns: 1fr;
-        gap: 5rem;
+        gap: 3rem;
         align-items: center;
 
         @include desktop {
@@ -585,9 +576,10 @@ $gold-light: #e6c96a;
     gap: 1.5rem;
     align-items: center;
 
-    @media (max-width: 900px) {
+    @include mobile {
         flex-direction: column;
-        margin-top: 4rem;
+        margin-top: 2rem;
+        gap: 1rem;
     }
 
     .visual-circle {
@@ -600,7 +592,7 @@ $gold-light: #e6c96a;
         border-radius: 50%;
         z-index: 0;
 
-        @media (max-width: 900px) {
+        @include mobile {
             display: none;
         }
     }
@@ -635,15 +627,15 @@ $gold-light: #e6c96a;
         }
 
         &.item--horizontal {
-            height: 12rem;
+            height: clamp(8rem, 15vw, 12rem);
         }
 
         &.item--vertical {
-            height: 18rem;
+            height: clamp(12rem, 25vw, 18rem);
         }
 
         &.item--tall {
-            height: 22rem;
+            height: clamp(16rem, 35vw, 22rem);
         }
     }
 }
@@ -783,165 +775,10 @@ $gold-light: #e6c96a;
 // ═══════════════════════════════════════════════════════════════
 // 2. PARTENAIRES
 // ═══════════════════════════════════════════════════════════════
-.partners-section {
-    padding: 8rem 0;
-    background-color: #ffffff;
-
-    .partners-inner {
-        @include container;
-        text-align: center;
-    }
-
-    .partners-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
-        margin-bottom: 5rem;
-        display: block;
-    }
-
-    .partners-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 4rem 6rem;
-        max-width: 1100px;
-        margin: 0 auto;
-
-        .partner-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #64748b;
-            font-family: $font-display, serif;
-            font-style: italic;
-            letter-spacing: -0.01em;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-
-            @include desktop {
-                font-size: 1.875rem;
-            }
-
-            &:hover {
-                color: #1b3a6b;
-            }
-        }
-    }
-}
 
 // ═══════════════════════════════════════════════════════════════
 // 6. NEWSLETTER CTA
 // ═══════════════════════════════════════════════════════════════
-.newsletter-section {
-    padding: 6rem 0;
-    background-color: #ffffff;
-
-    .newsletter-inner {
-        @include container;
-        background-color: #243e8b;
-        border-radius: 40px;
-        padding: 4rem 3rem;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        align-items: center;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-
-        @include desktop {
-            grid-template-columns: 1.1fr 0.9fr;
-            padding: 5rem 6.5rem;
-            gap: 8rem;
-        }
-    }
-}
-
-.newsletter-content {
-    h2 {
-        font-family: $font-display;
-        font-size: clamp(2rem, 3.5vw, 2.75rem);
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        line-height: 1.1;
-        color: #ffffff; // S'assurer que le texte est bien blanc
-    }
-
-    p {
-        font-size: 1.125rem;
-        line-height: 1.8;
-        opacity: 0.85;
-        max-width: 32rem;
-        color: rgba(255, 255, 255, 0.9); // Paragraphe également blanc cassé
-    }
-}
-
-.newsletter-action-area {
-    width: 100%;
-
-    .newsletter-privacy {
-        margin-top: 1.25rem;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        line-height: 1.5;
-        text-align: center;
-
-        @include tablet {
-            text-align: left;
-        }
-    }
-}
-
-.newsletter-form {
-    display: flex;
-    flex-direction: row; // TOUJOURS sur la même ligne comme demandé
-    gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    align-items: center;
-
-    .newsletter-input {
-        flex-grow: 1;
-        padding: 0.75rem 1.25rem;
-        border: none;
-        background: transparent;
-        color: #fff;
-        font-size: 1rem;
-        min-width: 0; // Empêche le flex item de déborder
-
-        &::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        &:focus {
-            outline: none;
-        }
-    }
-
-    .btn-newsletter {
-        padding: 0.875rem 2rem;
-        background-color: #ffffff;
-        color: #1b3a6b;
-        font-weight: 700;
-        font-size: 0.9375rem;
-        border: none;
-        border-radius: 100px; // Pill shape
-        transition: all 0.3s ease;
-        cursor: pointer;
-        white-space: nowrap;
-
-        &:hover {
-            background-color: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-    }
-}
 
 // ═══════════════════════════════════════════════════════════════
 // BOUTONS PARTAGÉS & UTILITAIRES

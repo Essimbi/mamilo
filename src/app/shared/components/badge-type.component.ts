@@ -6,7 +6,32 @@ import { PostType } from '../../core/models/post.model';
     selector: 'app-badge-type',
     standalone: true,
     imports: [CommonModule],
-    styleUrl: './badge-type.component.scss',
+    styles: [`
+    .badge-label {
+        padding: 0.125rem 0.625rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+    }
+
+    .badge-label.badge-article {
+        background-color: #1B3A6B;
+        color: #ffffff;
+    }
+
+    .badge-label.badge-note {
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .badge-label.badge-recap {
+        background-color: #4A90C4;
+        color: #ffffff;
+    }
+  `],
     template: `
     <span class="badge-label" [class]="'badge-' + type">
       {{ typeLabel }}

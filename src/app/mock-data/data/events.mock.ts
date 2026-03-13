@@ -30,6 +30,7 @@ export const MOCK_EVENTS: Event[] = [
             alt: 'Conference hall'
         },
         status: 'upcoming',
+        likesCount: 45,
         createdAt: '2024-01-10T10:00:00Z'
     },
     {
@@ -61,6 +62,7 @@ export const MOCK_EVENTS: Event[] = [
             alt: 'Collaboration room'
         },
         status: 'upcoming',
+        likesCount: 45,
         createdAt: '2024-02-01T10:00:00Z'
     },
     {
@@ -93,6 +95,7 @@ export const MOCK_EVENTS: Event[] = [
             alt: 'Laptop showing webinar'
         },
         status: 'upcoming',
+        likesCount: 45,
         createdAt: '2024-03-10T10:00:00Z'
     }
 ];
