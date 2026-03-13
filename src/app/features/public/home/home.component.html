@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="hero-stats">
-                    <div class="stat-item" *ngFor="let stat of stats; let last = last">
+                    <div class="stat-item" *ngFor="let stat of stats(); let last = last">
                         <span class="stat-value">{{ stat.value }}</span>
                         <span class="stat-label">{{ stat.label }}</span>
                     </div>
@@ -44,7 +44,7 @@
             <div class="hero-visual">
                 <div class="hero-image-frame">
                     <div class="profile-image-container">
-                        <img src="/hero-mamilo.png" [alt]="author.name" class="profile-img" loading="eager" />
+                        <img src="/hero-mamilo.png" [alt]="author()?.name" class="profile-img" loading="eager" />
                     </div>
                     <div class="glow-effect glow-effect--top"></div>
                     <div class="glow-effect glow-effect--bottom"></div>
