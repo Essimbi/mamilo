@@ -1,0 +1,139 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { GlobalStateService } from '../../../core/services/global-state.service';
+import { SeoService } from '../../../core/services/seo.service';
+import { Event } from '../../../core/models/event.model';
+import { LucideAngularModule } from 'lucide-angular';
+
+@Component({
+  selector: 'app-events-list',
+  standalone: true,
+  imports: [CommonModule, RouterModule, LucideAngularModule],
+  styleUrl: './events-list.component.scss',
+  template: `
+    <div class="events-page-wrapper">
+      <!-- Hero Section -->
+      <section class="events-hero">
+        <div class="hero-container">
+          <div class="hero-left">
+            <span class="eyebrow">Presse de monde et français</span>
+            <h1 class="hero-title">Événements académiques et Engagements professionnels</h1>
+            <p class="hero-subtitle">
+              Explorer les tendances mondiales en matière de communication à travers des conférences, des ateliers et des colloques internationaux.
+            </p>
+          </div>
+          <div class="hero-right">
+            <div class="status-toggle">
+              <button class="toggle-btn active">Tous</button>
+              <button class="toggle-btn">Prochains</button>
+              <button class="toggle-btn">Passés</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Bar -->
+      <nav class="filter-strip">
+        <div class="filter-container">
+          <div class="categories">
+            <span class="filter-label">FILTRER PAR CATÉGORIE :</span>
+            <a href="#" class="category-link">Keynotes</a>
+            <a href="#" class="category-link">Ateliers</a>
+            <a href="#" class="category-link">Colloques</a>
+            <a href="#" class="category-link">Séminaires</a>
+          </div>
+          <div class="results-count">
+            Affichage de 8 résultats
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Grid Content -->
+      <main class="events-grid-section">
+        <div class="grid-container">
+          <div *ngIf="events()?.length; else loading" class="events-grid">
+            <article *ngFor="let event of events()" class="event-card" [class.is-past]="event.status === 'past'">
+              <div class="card-visual">
+                <img [src]="event.coverImage?.url || 'assets/images/placeholder.jpg'" [alt]="event.title" class="event-img">
+                <div class="date-badge">
+                  <span class="month">{{ event.startDate | date:'MMM' }}</span>
+                  <span class="day">{{ event.startDate | date:'dd' }}</span>
+                </div>
+                <div class="status-badge" [class.upcoming]="event.status === 'upcoming'" [class.past]="event.status === 'past'">
+                  {{ event.status === 'upcoming' ? 'Prochain' : 'Passé' }}
+                </div>
+              </div>
+
+              <div class="card-content">
+                <span class="event-type-label">{{ event.type }}</span>
+                <h3 class="event-card-title">{{ event.title }}</h3>
+                
+                <div class="event-info-list">
+                  <div class="info-item">
+                    <lucide-icon name="calendar" size="14"></lucide-icon>
+                    <span>{{ event.startDate | date:'MMM dd, yyyy' | uppercase }}</span>
+                  </div>
+                  <div class="info-item">
+                    <lucide-icon name="map-pin" size="14"></lucide-icon>
+                    <span>{{ event.location.venue }}, {{ event.location.city }}</span>
+                  </div>
+                  <div class="info-item">
+                    <lucide-icon name="clock" size="14"></lucide-icon>
+                    <span>{{ event.startDate | date:'HH:mm' }} — {{ event.endDate | date:'HH:mm' }} GMT</span>
+                  </div>
+                </div>
+
+                <p class="event-excerpt">
+                  {{ event.description | slice:0:150 }}...
+                </p>
+              </div>
+
+              <div *ngIf="event.status === 'past'" class="card-footer">
+                <button [routerLink]="['/events', event.slug]" class="recap-btn">
+                  Voir le récap <lucide-icon name="arrow-right" size="14"></lucide-icon>
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div class="grid-footer">
+            <div class="pagination-info">Affichage de la page 1 sur 1</div>
+            <div class="pagination-nav">
+              <button class="nav-arrow" disabled><lucide-icon name="chevron-left" size="16"></lucide-icon></button>
+              <button class="nav-page active">1</button>
+              <button class="nav-arrow" disabled><lucide-icon name="chevron-right" size="16"></lucide-icon></button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- CTA Engagement Section -->
+      <section class="engagement-cta">
+        <div class="cta-container">
+          <h2 class="cta-title">Organiser une conférence ou un atelier ?</h2>
+          <p class="cta-text">
+            Le Dr Smith est disponible pour des conférences, des interventions dans les médias et des missions de conseil institutionnel sur des sujets liés à l'éthique et à la communication numériques modernes.
+          </p>
+          <button class="cta-button">Demander un engagement</button>
+        </div>
+      </section>
+
+      <ng-template #loading>
+        <div class="loading-grid">
+          <div *ngFor="let i of [1,2,3]" class="skeleton-card"></div>
+        </div>
+      </ng-template>
+    </div>
+  `
+})
+export class EventsListComponent implements OnInit {
+  private state = inject(GlobalStateService);
+  private seoService = inject(SeoService);
+
+  events = this.state.events;
+
+  ngOnInit(): void {
+    this.seoService.updateTitle('Événements');
+  }
+}

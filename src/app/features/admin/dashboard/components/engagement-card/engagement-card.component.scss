@@ -1,0 +1,78 @@
+@use '../../../../../../styles/abstracts/variables' as *;
+@use '../../../../../../styles/abstracts/mixins' as *;
+
+.engagement-card {
+    background-color: $navy;
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: $white;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    display: block;
+    opacity: 0.8;
+}
+
+.engagement-main {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.icon-box {
+    width: 48px;
+    height: 48px;
+    background-color: rgba($white, 0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.engagement-info {
+    h3 {
+        font-family: $font-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+
+    .time {
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .role {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        margin: 0;
+        line-height: 1.5;
+    }
+}
+
+.btn-details {
+    width: 100%;
+    padding: 1rem;
+    background-color: $white;
+    color: $navy;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: $slate-50;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+}

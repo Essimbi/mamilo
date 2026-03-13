@@ -1,0 +1,547 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.event-page-wrapper {
+    background-color: $white;
+}
+
+// 1. Hero Section
+.event-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 450px;
+    background-size: cover;
+    background-position: center;
+    @include flex-center;
+    color: $white;
+    animation: fadeIn 0.8s ease-out forwards;
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(0deg, rgba($navy, 0.9) 0%, rgba($navy, 0.4) 100%);
+    }
+
+    .hero-content {
+        @include container;
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        max-width: 900px;
+    }
+
+    .hero-breadcrumb {
+        margin-bottom: 2.5rem;
+
+        a {
+            color: rgba($white, 0.7);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: $white;
+            }
+        }
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background-color: $medium-blue;
+        color: $white;
+        font-size: 0.6875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 0.4rem 1.25rem;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+    }
+
+    .hero-title {
+        font-family: $font-display;
+        font-size: 3.5rem;
+        line-height: 1.1;
+        font-weight: 850;
+        margin-bottom: 2.5rem;
+        letter-spacing: -0.02em;
+
+        @include mobile {
+            font-size: 2.25rem;
+        }
+    }
+
+    .hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: rgba($white, 0.9);
+
+            lucide-icon {
+                color: $medium-blue;
+            }
+        }
+    }
+}
+
+// 2. Content Layout
+.content-container {
+    @include container;
+    padding-top: 6rem;
+    padding-bottom: 10rem;
+}
+
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 5rem;
+
+    @include tablet {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+}
+
+// 3. Main Column
+.main-column {
+    section {
+        margin-bottom: 6rem;
+    }
+
+    .section-badge {
+        display: inline-block;
+        font-size: 0.625rem;
+        font-weight: 900;
+        color: $medium-blue;
+        text-transform: uppercase;
+        background-color: $slate-50;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-family: $font-display;
+        font-size: 2rem;
+        font-weight: 850;
+        color: $navy;
+        margin-bottom: 2rem;
+    }
+
+    .event-full-description {
+        font-family: $font-serif;
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: $slate-700;
+        margin-bottom: 3rem;
+
+        p {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .highlights-box {
+        background-color: $slate-50;
+        border-radius: 1rem;
+        padding: 3rem;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 4rem;
+        border: 1px solid $slate-100;
+
+        @include mobile {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        .highlight-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9375rem;
+            font-weight: 900;
+            color: $medium-blue;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                position: relative;
+                padding-left: 1.25rem;
+                margin-bottom: 0.75rem;
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: $slate-600;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    top: 0.5rem;
+                    width: 4px;
+                    height: 4px;
+                    border-radius: 50%;
+                    background-color: $medium-blue;
+                }
+            }
+        }
+
+        .highlight-text {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: $slate-500;
+            font-weight: 500;
+        }
+    }
+}
+
+// 4. Speakers Section
+.speakers-section {
+    .section-header {
+        @include flex-between;
+        margin-bottom: 3rem;
+        border-bottom: 1px solid $slate-100;
+        padding-bottom: 1.5rem;
+
+        .header-meta {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: $slate-400;
+            font-style: italic;
+        }
+    }
+
+    .speakers-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.5rem;
+
+        @include mobile {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .speaker-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 1rem;
+        border: 1px solid $slate-50;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background-color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .speaker-img {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 3px solid $slate-50;
+        }
+
+        .speaker-name {
+            font-size: 1.125rem;
+            font-weight: 800;
+            color: $navy;
+            margin-bottom: 0.35rem;
+        }
+
+        .speaker-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: $medium-blue;
+            margin-bottom: 0.25rem;
+        }
+
+        .speaker-org {
+            font-size: 0.75rem;
+            color: $slate-400;
+            font-weight: 500;
+        }
+    }
+}
+
+// 5. Gallery Section
+.gallery-section {
+    .section-subtitle {
+        color: $slate-500;
+        font-size: 1.0625rem;
+        line-height: 1.6;
+        margin-bottom: 3rem;
+        max-width: 600px;
+    }
+
+    .gallery-layout {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 1.5rem;
+
+        @include mobile {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .gallery-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+
+    .gallery-main {
+        aspect-ratio: 4 / 3;
+    }
+
+    .gallery-side {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        >img {
+            flex: 1;
+            aspect-ratio: 16 / 9;
+        }
+
+        .gallery-bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 120px;
+        }
+    }
+}
+
+// 6. Map Section
+.map-section {
+    .map-placeholder {
+        height: 400px;
+        background-color: $slate-100;
+        border-radius: 1.5rem;
+        @include flex-center;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        position: relative;
+
+        .location-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 320px;
+            z-index: 5;
+
+            .map-icon {
+                color: $medium-blue;
+                margin-bottom: 1.25rem;
+            }
+
+            h4 {
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: $navy;
+                margin-bottom: 0.75rem;
+            }
+
+            p {
+                font-size: 0.875rem;
+                color: $slate-500;
+                line-height: 1.5;
+            }
+        }
+    }
+}
+
+// 7. Sidebar
+.sidebar-column {
+    .registration-card {
+        background-color: $navy;
+        color: $white;
+        padding: 3.5rem;
+        border-radius: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 30px 60px -12px rgba($navy, 0.25);
+        position: sticky;
+        top: 2rem;
+
+        .reg-title {
+            font-size: 1.75rem;
+            font-weight: 850;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .reg-text {
+            color: rgba($white, 0.7);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .reg-benefits {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 3.5rem;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: rgba($white, 0.9);
+
+                lucide-icon {
+                    color: $medium-blue;
+                }
+            }
+        }
+
+        .register-button {
+            width: 100%;
+            background-color: $white;
+            color: $navy;
+            border: none;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+        }
+    }
+
+    .related-events-box {
+        background-color: $slate-50;
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        border: 1px solid $slate-100;
+
+        .related-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 850;
+            color: $navy;
+            margin-bottom: 2rem;
+            font-family: $font-display;
+        }
+
+        .related-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .related-item {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+            cursor: pointer;
+
+            &:hover .related-info h5 {
+                color: $medium-blue;
+            }
+
+            .date-mini {
+                background-color: white;
+                border: 1px solid $slate-100;
+                width: 3.5rem;
+                height: 3.5rem;
+                border-radius: 0.75rem;
+                @include flex-center;
+                flex-direction: column;
+                flex-shrink: 0;
+
+                .mini-month {
+                    font-size: 0.625rem;
+                    font-weight: 900;
+                    color: $slate-400;
+                    text-transform: uppercase;
+                }
+
+                .mini-day {
+                    font-size: 1.125rem;
+                    font-weight: 900;
+                    color: $navy;
+                }
+            }
+
+            .related-info {
+                h5 {
+                    font-size: 0.9375rem;
+                    font-weight: 800;
+                    color: $navy;
+                    margin-bottom: 0.25rem;
+                    transition: color 0.3s ease;
+                }
+
+                p {
+                    font-size: 0.75rem;
+                    color: $slate-400;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        .view-all-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $slate-400;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: $navy;
+            }
+        }
+    }
+}
+
+// Animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

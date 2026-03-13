@@ -1,0 +1,711 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.article-container {
+    animation: fadeIn 0.7s ease-in-out forwards;
+    background-color: $white;
+    position: relative;
+    overflow: visible; // Allow sticky sidebar to be visible
+}
+
+// 0. Social Sidebar (Sticky)
+.social-sidebar {
+    position: absolute;
+    left: 4rem;
+    top: 30rem;
+    height: calc(100% - 30rem);
+    width: 3rem;
+    z-index: 50;
+
+    @include tablet {
+        display: none; // Hide on tablet/mobile for now or reposition
+    }
+
+    @include mobile {
+        display: none;
+    }
+
+    .sidebar-inner {
+        position: sticky;
+        top: 15rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+
+        .social-icon {
+            color: $slate-400;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            @include flex-center;
+
+            &:hover {
+                color: $navy;
+                transform: scale(1.1);
+            }
+
+            &.bookmark {
+                color: $slate-300;
+            }
+        }
+
+        .divider {
+            width: 1.5rem;
+            height: 1px;
+            background-color: $slate-100;
+            margin: 0.5rem 0;
+        }
+    }
+}
+
+// 1. Hero Section
+.article-hero {
+    padding: 8rem 0 5rem;
+    text-align: center;
+    background-color: $white;
+
+    .hero-content {
+        @include container;
+        max-width: 850px;
+    }
+
+    .breadcrumb {
+        margin-bottom: 2.5rem;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $slate-400;
+            font-size: 0.8125rem;
+            text-decoration: none;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: $navy;
+            }
+        }
+    }
+
+    .category-badge {
+        display: inline-block;
+        font-size: 0.6875rem;
+        font-weight: 800;
+        color: $medium-blue;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 0.4rem 1.25rem;
+        background-color: rgba($medium-blue, 0.06);
+        border-radius: 4px;
+        margin-bottom: 1.75rem;
+    }
+
+    .article-title {
+        font-size: 3rem;
+        font-weight: 850;
+        color: $navy;
+        margin-bottom: 1.75rem;
+        font-family: $font-display;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+
+        @include desktop {
+            font-size: 3.75rem;
+        }
+    }
+
+    .article-subtitle {
+        font-size: 1.35rem;
+        color: $slate-600;
+        line-height: 1.5;
+        margin-bottom: 3.5rem;
+        font-style: italic;
+        font-family: $font-serif;
+        font-weight: 500;
+        max-width: 750px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .author-meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.25rem;
+
+        .author-avatar {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid $slate-50;
+        }
+
+        .meta-info {
+            text-align: left;
+
+            .author-name {
+                display: block;
+                font-weight: 800;
+                color: $navy;
+                font-size: 1rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .sub-meta {
+                display: flex;
+                gap: 1.25rem;
+                font-size: 0.75rem;
+                color: $slate-400;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+
+                span {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                }
+            }
+        }
+    }
+}
+
+// 2. Featured Image
+.featured-image-container {
+    @include container;
+    max-width: 1000px;
+    margin-bottom: 5rem;
+
+    .featured-image {
+        width: 100%;
+        border-radius: 1rem;
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
+        margin-bottom: 1.75rem;
+    }
+
+    .image-caption {
+        text-align: center;
+        font-size: 0.8125rem;
+        color: $slate-400;
+        font-style: italic;
+        font-weight: 500;
+    }
+}
+
+// 3. Article Body
+.article-main {
+    @include container;
+    max-width: 800px;
+    padding-bottom: 10rem;
+}
+
+.article-body {
+    font-family: $font-serif;
+    color: $slate-800;
+    line-height: 1.9;
+    font-size: 1.1875rem;
+    margin-bottom: 5rem;
+
+    p {
+        margin-bottom: 2.25rem;
+    }
+
+    ::ng-deep {
+        h2 {
+            font-family: $font-display;
+            color: $navy;
+            font-size: 2.25rem;
+            margin: 4rem 0 1.75rem;
+            font-weight: 800;
+        }
+    }
+}
+
+.highlight-quote {
+    background-color: #f7fbff;
+    border-left: 5px solid $medium-blue;
+    padding: 3.5rem 4.5rem;
+    margin: 4.5rem -2rem;
+    border-radius: 0 1rem 1rem 0;
+
+    @include mobile {
+        margin: 4rem 0;
+        padding: 2.5rem;
+    }
+
+    p {
+        font-family: $font-serif;
+        font-size: 1.65rem;
+        color: $medium-blue;
+        line-height: 1.5;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        font-style: italic;
+    }
+
+    .quote-source {
+        font-size: 0.8125rem;
+        font-weight: 800;
+        color: $navy;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        position: relative;
+        padding-left: 2.5rem;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 1.5rem;
+            height: 2px;
+            background-color: $medium-blue;
+        }
+    }
+}
+
+// 4. Data Section
+.data-section {
+    margin: 5rem 0;
+
+    .chart-container {
+        background-color: $white;
+        border: 1px solid $slate-100;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04);
+
+        .chart-header {
+            margin-bottom: 2.5rem;
+
+            h3 {
+                color: $navy;
+                font-size: 1.35rem;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+            }
+
+            p {
+                color: $slate-500;
+                font-size: 0.9375rem;
+                font-weight: 500;
+            }
+        }
+
+        .chart-mockup {
+            background-color: $slate-800;
+            height: 350px;
+            border-radius: 1rem;
+            @include flex-center;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+
+            .chart-placeholder {
+                @include flex-center;
+                flex-direction: column;
+                color: $slate-600;
+                gap: 1.25rem;
+                z-index: 2;
+
+                span {
+                    font-weight: 700;
+                    font-size: 0.8125rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                }
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba($medium-blue, 0.2), transparent);
+            }
+        }
+
+        .chart-stat {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid $slate-50;
+
+            .stat-value {
+                font-size: 3rem;
+                font-weight: 900;
+                color: $medium-blue;
+                letter-spacing: -0.05em;
+            }
+
+            .stat-label {
+                color: $slate-600;
+                font-size: 1rem;
+                max-width: 300px;
+                line-height: 1.4;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+// 5. Tags Section
+.tags-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 6rem;
+
+    .tag-btn {
+        padding: 0.6rem 1.5rem;
+        background-color: $slate-50;
+        color: $slate-500;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 2rem;
+        border: 1.5px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+            background-color: $white;
+            border-color: $navy;
+            color: $navy;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+    }
+}
+
+// 6. Author Card
+.author-card {
+    background-color: $slate-50;
+    border-radius: 1.5rem;
+    padding: 3.5rem;
+    margin-bottom: 7rem;
+
+    .author-card-content {
+        display: flex;
+        gap: 3rem;
+        align-items: center;
+
+        @include mobile {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+
+        .author-card-avatar {
+            width: 10rem;
+            height: 10rem;
+            border-radius: 1rem;
+            object-fit: cover;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .author-card-info {
+            .author-card-name {
+                font-size: 1.75rem;
+                color: $navy;
+                margin-bottom: 0.5rem;
+                font-weight: 800;
+                font-family: $font-display;
+            }
+
+            .author-card-role {
+                font-size: 0.75rem;
+                font-weight: 900;
+                color: $medium-blue;
+                text-transform: uppercase;
+                letter-spacing: 0.15em;
+                margin-bottom: 1.5rem;
+                display: block;
+            }
+
+            .author-card-bio {
+                color: $slate-600;
+                line-height: 1.6;
+                margin-bottom: 2rem;
+                font-size: 1rem;
+                font-weight: 500;
+            }
+
+            .read-more-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                color: $navy;
+                font-weight: 800;
+                text-decoration: none;
+                font-size: 0.8125rem;
+                padding: 0.75rem 1.5rem;
+                border: 2px solid $slate-200;
+                border-radius: 0.5rem;
+                background-color: white;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    border-color: $navy;
+                    background-color: $navy;
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
+// 7. Related Articles
+.related-articles {
+    border-top: 1px solid $slate-100;
+    padding-top: 6rem;
+    margin-bottom: 8rem;
+
+    .section-header {
+        @include flex-between;
+        margin-bottom: 4rem;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: $navy;
+            font-family: $font-display;
+            font-weight: 800;
+        }
+
+        .view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $medium-blue;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+
+            &:hover {
+                gap: 1rem;
+                color: $navy;
+            }
+        }
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3rem;
+
+        @include tablet {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+
+        @include mobile {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .related-card {
+        cursor: pointer;
+
+        .card-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        &:hover .card-img {
+            transform: scale(1.03) translateY(-10px);
+        }
+
+        .card-category {
+            font-size: 0.6875rem;
+            font-weight: 900;
+            color: $medium-blue;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: $navy;
+            line-height: 1.35;
+            font-weight: 800;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: $medium-blue;
+            }
+        }
+    }
+}
+
+// 8. Discussions
+.discussion-section {
+    background-color: $white;
+    border-top: 1px solid $slate-100;
+    padding-top: 6rem;
+
+    .discussion-title {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        font-size: 1.75rem;
+        color: $navy;
+        margin-bottom: 4rem;
+        font-family: $font-display;
+        font-weight: 800;
+    }
+
+    .comment-input-area {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 5rem;
+        background-color: $slate-50;
+        padding: 3rem;
+        border-radius: 2rem;
+
+        @include mobile {
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .current-user-avatar {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        .input-wrapper {
+            flex: 1;
+
+            textarea {
+                width: 100%;
+                min-height: 150px;
+                border: 2px solid $slate-100;
+                border-radius: 1rem;
+                padding: 1.5rem;
+                font-family: inherit;
+                font-size: 1.0625rem;
+                margin-bottom: 1.5rem;
+                resize: none;
+                transition: all 0.3s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: $medium-blue;
+                    box-shadow: 0 0 0 5px rgba($medium-blue, 0.05);
+                    background-color: white;
+                }
+            }
+
+            .input-footer {
+                @include flex-between;
+
+                @include mobile {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 2rem;
+                }
+
+                .char-info {
+                    font-size: 0.8125rem;
+                    color: $slate-400;
+                    font-weight: 500;
+                }
+
+                .submit-btn {
+                    background-color: $navy;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2.5rem;
+                    border-radius: 0.75rem;
+                    font-weight: 900;
+                    font-size: 0.9375rem;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 14px rgba($navy, 0.2);
+
+                    &:hover {
+                        background-color: $medium-blue;
+                        transform: translateY(-3px);
+                        box-shadow: 0 8px 20px rgba($medium-blue, 0.3);
+                    }
+                }
+            }
+        }
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 2rem;
+        padding: 3.5rem 0;
+        border-top: 1px solid $slate-50;
+
+        @include mobile {
+            gap: 1.5rem;
+        }
+
+        .comment-avatar {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+        }
+
+        .comment-content {
+            .comment-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 0.75rem;
+
+                .comment-author {
+                    font-weight: 800;
+                    color: $navy;
+                    font-size: 1.0625rem;
+                }
+
+                .comment-date {
+                    font-size: 0.8125rem;
+                    color: $slate-300;
+                    font-weight: 600;
+                }
+            }
+
+            .comment-text {
+                color: $slate-600;
+                line-height: 1.7;
+                font-size: 1.0625rem;
+                font-weight: 500;
+            }
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

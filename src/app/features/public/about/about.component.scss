@@ -1,0 +1,869 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.about-page {
+    background-color: $white;
+    color: $slate-800;
+    font-family: $font-sans;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.container {
+    @include container;
+    max-width: 1000px;
+}
+
+// ═══════════════════════════════════════════════
+// 1. HERO SECTION
+// ═══════════════════════════════════════════════
+
+.about-hero {
+    padding: 6rem 0;
+    background-color: #f6f8ff; // Very light blue/gray background
+    text-align: left;
+
+    .hero-container {
+        max-width: 1100px;
+    }
+
+    .hero-profile {
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+        align-items: center;
+
+        @include desktop {
+            flex-direction: row;
+            align-items: center;
+            gap: 6rem;
+        }
+    }
+
+    .profile-column-left {
+        flex-shrink: 0;
+    }
+
+    .profile-image-container {
+        position: relative;
+        padding: 2.5rem;
+
+        .image-frame-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            border-top: 1px solid #c2cfe0;
+            border-left: 1px solid #c2cfe0;
+        }
+
+        .image-frame-bottom {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-bottom: 1px solid #c2cfe0;
+            border-right: 1px solid #c2cfe0;
+        }
+
+        .profile-image-wrapper {
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: $white;
+            padding: 0;
+            box-shadow: none;
+
+            @media (max-width: 640px) {
+                width: 260px;
+                height: 260px;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border: none;
+            }
+        }
+    }
+
+    .profile-column-right {
+        flex: 1;
+
+        .hero-badge {
+            display: inline-block;
+            background-color: #1e3a8a; // Dark blue
+            color: $white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-transform: none;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        h1 {
+            font-family: $font-serif;
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            color: #0c0c0c;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .hero-subtitle {
+            font-family: $font-serif;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: $slate-500;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero-declaration {
+            .declaration-label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: #8b9ec1;
+                letter-spacing: 0.15em;
+                margin-bottom: 1.5rem;
+                text-transform: uppercase;
+            }
+
+            blockquote {
+                font-family: $font-sans; // The mockup looks like sans for the quote? Wait, looking closer... it looks like a clean serif.
+                font-family: $font-serif;
+                font-size: 1.05rem;
+                color: #4a5568;
+                line-height: 1.7;
+                margin: 0;
+                padding: 0;
+                font-style: normal; // It's not italic in the mockup quote text itself? Ah, looking at the image, it's normal weight serif.
+
+                &::before {
+                    content: '« ';
+                }
+
+                &::after {
+                    content: ' »';
+                }
+            }
+        }
+
+        .hero-actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-start;
+
+            .btn-collaboration {
+                background-color: transparent;
+                color: $medium-blue;
+                border: 1px solid $medium-blue;
+                padding: 0.6rem 1.25rem;
+                border-radius: 4px;
+                font-weight: 500;
+                font-size: 0.85rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                transition: all 0.2s ease;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: rgba($medium-blue, 0.05);
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+
+    .divider-text {
+        font-family: $font-sans;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $navy;
+        white-space: nowrap;
+    }
+
+    .divider-line {
+        flex: 1;
+        height: 1px;
+        background-color: $slate-200;
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 2. BIOGRAPHY
+// ═══════════════════════════════════════════════
+
+.bio-section {
+    padding: 6rem 0;
+    background-color: $white;
+
+    .bio-header {
+        display: flex;
+        align-items: baseline;
+        gap: 2rem;
+        margin-bottom: 4rem;
+
+        h2 {
+            font-family: $font-serif;
+            font-size: 2rem;
+            color: #1a202c;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .bio-divider {
+            flex: 1;
+            height: 1px;
+            background-color: #e2e8f0;
+        }
+    }
+
+    .bio-content {
+        max-width: 850px;
+        margin-left: auto; // Content is pushed to the right? No, let's look at mockup.
+        // In mockup, the text starts roughly where the "Biographie" text would end if it was a column.
+        // Actually, it looks like it has a large left margin on desktop.
+
+        @include desktop {
+            margin-left: 20%;
+        }
+
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #4a5568;
+
+        p {
+            margin-bottom: 2rem;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 3. TIMELINE
+// ═══════════════════════════════════════════════
+
+.academic-section {
+    padding: 4rem 0;
+
+    .timeline {
+        position: relative;
+        padding-left: 2.5rem;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: $slate-100;
+        }
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 4rem;
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -2.5rem;
+        top: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: $white;
+        border: 3px solid $slate-300;
+        transform: translateX(-6px);
+        z-index: 2;
+
+        &.current {
+            width: 32px;
+            height: 32px;
+            background-color: $medium-blue;
+            border-color: $medium-blue;
+            color: $white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(-15px);
+            box-shadow: 0 4px 10px rgba($medium-blue, 0.3);
+        }
+    }
+
+    .timeline-content {
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+
+            .timeline-date {
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: $medium-blue;
+            }
+
+            .timeline-tag {
+                font-size: 0.65rem;
+                font-weight: 700;
+                color: $slate-400;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: $navy;
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
+        .timeline-location {
+            font-size: 0.95rem;
+            color: $slate-500;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .timeline-desc {
+            font-size: 1rem;
+            color: $slate-600;
+            line-height: 1.6;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 4. PUBLICATIONS
+// ═══════════════════════════════════════════════
+
+.publications-section {
+    padding: 4rem 0;
+
+    .publications-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 2rem;
+
+        @include tablet {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include desktop {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .pub-card {
+        padding: 1.5rem;
+        background-color: $white;
+        border-bottom: 1px solid $slate-100;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+            border-bottom-color: $medium-blue;
+        }
+
+        .pub-type {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: $medium-blue;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .pub-year {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: $slate-400;
+            margin-bottom: 0.75rem;
+        }
+
+        .pub-title {
+            font-size: 1.1rem;
+            color: $navy;
+            font-family: $font-serif;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .pub-publisher {
+            font-size: 0.85rem;
+            color: $slate-500;
+            margin-bottom: 1.5rem;
+        }
+
+        .pub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            text-decoration: none;
+            color: $slate-400;
+            font-weight: 700;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $medium-blue;
+            }
+        }
+    }
+
+    .publications-action {
+        margin-top: 4rem;
+        text-align: center;
+
+        .btn-outline {
+            background-color: $slate-50;
+            border: 1px solid $slate-200;
+            color: $navy;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover {
+                background-color: $slate-100;
+                border-color: $slate-300;
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 5. ENGAGEMENTS
+// ═══════════════════════════════════════════════
+
+.engagements-section {
+    padding: 6rem 0;
+    background-color: #f8faff; // Custom light blue for this section
+
+    .featured-engagements {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+
+        @include tablet {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .eng-featured-card {
+        background-color: $white;
+        display: flex;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        transition: transform 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .eng-card-left {
+            width: 120px;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: $white;
+            flex-shrink: 0;
+
+            &.keynote {
+                background-color: #2b4c9b; // Dark blue
+            }
+
+            &.symposium {
+                background-color: #3b82f6; // Lighter blue
+            }
+
+            .eng-icon-box {
+                margin-bottom: 1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .eng-type {
+                font-size: 0.65rem;
+                font-weight: 800;
+                letter-spacing: 0.1em;
+            }
+
+            .eng-year {
+                font-family: $font-serif;
+                font-size: 1.5rem;
+                font-weight: 700;
+            }
+        }
+
+        .eng-info {
+            padding: 2rem;
+            flex: 1;
+
+            h4 {
+                font-size: 1.25rem;
+                color: $navy;
+                margin-bottom: 0.5rem;
+                font-weight: 700;
+                line-height: 1.3;
+            }
+
+            .location-text {
+                font-size: 0.85rem;
+                color: $medium-blue;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            .desc {
+                font-size: 0.95rem;
+                color: $slate-600;
+                line-height: 1.6;
+            }
+        }
+    }
+
+    .upcoming-seminars {
+        background-color: $white;
+        border-radius: 12px;
+        border: 1px solid $slate-100;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+
+        .seminar-header {
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid $slate-100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            h3 {
+                font-size: 1.1rem;
+                color: $navy;
+                font-weight: 700;
+                margin: 0;
+            }
+        }
+
+        .seminar-list {
+            .seminar-row {
+                display: flex;
+                align-items: center;
+                padding: 1.5rem 2.5rem;
+                border-bottom: 1px solid $slate-50;
+                transition: background-color 0.2s;
+
+                @media (max-width: 768px) {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &:hover {
+                    background-color: $slate-50;
+                }
+
+                .seminar-date {
+                    width: 140px;
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    color: $slate-400;
+                    flex-shrink: 0;
+                }
+
+                .seminar-title {
+                    flex: 1;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: $navy;
+                }
+
+                .seminar-end {
+                    display: flex;
+                    align-items: center;
+                    gap: 2rem;
+                    color: $slate-400;
+
+                    .seminar-venue {
+                        font-size: 0.85rem;
+                        font-weight: 400;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.stats-section {
+    padding: 6rem 0;
+    background-color: #f8faff; // Same light background
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+
+        @include desktop {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .stat-card {
+        background-color: $white;
+        padding: 3rem 2rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid $slate-100;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        transition: transform 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-family: $font-serif;
+            font-size: 2.5rem;
+            color: $navy;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            span {
+                color: $medium-blue;
+                font-size: 2rem;
+                margin-left: 0.2rem;
+            }
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: $navy;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6. NEWSLETTER CTA
+// ═══════════════════════════════════════════════════════════════
+
+.newsletter-section {
+    padding: 6rem 0;
+    background-color: $navy;
+    color: $white;
+    overflow: hidden;
+
+    .newsletter-inner {
+        @include container;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        align-items: center;
+
+        @include desktop {
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+        }
+    }
+
+    .newsletter-content {
+        h2 {
+            font-family: $font-display;
+            font-size: clamp(2rem, 3.5vw, 2.75rem);
+            font-weight: 700;
+            color: $white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: $slate-300;
+            max-width: 36rem;
+        }
+    }
+
+    .newsletter-action-area {
+        .newsletter-form {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+
+            @media (max-width: 600px) {
+                flex-direction: column;
+            }
+
+            .newsletter-input {
+                flex: 1;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 1rem 1.5rem;
+                border-radius: 6px;
+                color: $white;
+                font-size: 0.9375rem;
+                transition: all 0.3s ease;
+
+                &::placeholder {
+                    color: $slate-500;
+                }
+
+                &:focus {
+                    outline: none;
+                    background: rgba(255, 255, 255, 0.08);
+                    border-color: $medium-blue;
+                    box-shadow: 0 0 0 4px rgba($medium-blue, 0.1);
+                }
+            }
+
+            .btn-newsletter {
+                padding: 1rem 2.5rem;
+                background-color: $medium-blue;
+                color: $white;
+                border: none;
+                border-radius: 6px;
+                font-weight: 700;
+                font-size: 0.9375rem;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+
+                &:hover {
+                    background-color: darken($medium-blue, 5%);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                }
+            }
+        }
+
+        .newsletter-privacy {
+            font-size: 0.75rem;
+            color: $slate-400;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 7. PARTENAIRES
+// ═══════════════════════════════════════════════════════════════
+
+.partners-section {
+    padding: 6rem 0;
+    background-color: $white;
+
+    .partners-inner {
+        @include container;
+        text-align: center;
+    }
+
+    .partners-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: $slate-300;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        margin-bottom: 3.5rem;
+    }
+
+    .partners-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem 6rem;
+
+        .partner-name {
+            font-family: $font-display;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: $slate-100;
+            transition: all 0.3s ease;
+            cursor: default;
+
+            &:hover {
+                color: $slate-300;
+                transform: scale(1.05);
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════════════════════════
+
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    will-change: transform, opacity;
+
+    &.animated {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Stagger delays for better feel
+.about-hero {
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

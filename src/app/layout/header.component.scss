@@ -1,0 +1,216 @@
+@use 'sass:color';
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba($white, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba($slate-200, 0.5);
+    transition: all 0.3s ease;
+
+    &.scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .nav-container {
+        @include container;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 4.5rem;
+    }
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+
+    .logo-box {
+        width: 2.2rem;
+        height: 2.2rem;
+        background-color: $navy;
+        color: $white;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba($navy, 0.15);
+    }
+
+    .logo-text {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: $navy;
+        font-family: $font-display;
+        letter-spacing: -0.01em;
+    }
+}
+
+.desktop-nav {
+    display: none;
+    gap: 2rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    @include desktop {
+        display: flex;
+    }
+}
+
+.nav-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $slate-600;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+        color: $navy;
+    }
+
+    &.active {
+        color: $navy;
+        font-weight: 700;
+        border-bottom-color: $navy;
+    }
+}
+
+.actions-area {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.search-icon {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    color: $slate-600;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        color: $navy;
+    }
+}
+
+.btn-subscribe,
+.btn-admin {
+    display: none;
+    padding: 0.65rem 1.75rem;
+    background-color: $navy;
+    color: $white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba($navy, 0.15);
+
+    @include desktop {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &:hover {
+        background-color: #152d54;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba($navy, 0.25);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.mobile-admin-link {
+    color: $medium-blue !important;
+    border-bottom: 2px solid $medium-blue;
+    padding-bottom: 0.5rem;
+}
+
+.mobile-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: $navy;
+    cursor: pointer;
+    padding: 0.5rem;
+    flex-shrink: 0;
+
+    @include desktop {
+        display: none;
+    }
+}
+
+.mobile-menu {
+    display: none;
+
+    &.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background-color: $white;
+        z-index: 100;
+        padding: 2rem;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+
+        span {
+            font-weight: 800;
+            color: $navy;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        button {
+            background: none;
+            border: none;
+            color: $navy;
+            cursor: pointer;
+        }
+    }
+
+    nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        a {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: $navy;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: -0.025em;
+        }
+
+        .btn-connect {
+            display: block;
+            margin-top: 1rem;
+            text-align: center;
+        }
+    }
+}

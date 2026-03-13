@@ -1,0 +1,278 @@
+<div class="home-container">
+
+    <!-- ═══════════════════════════════════════════════
+       1. HERO SECTION
+  ═══════════════════════════════════════════════ -->
+    <section class="hero-section">
+        <div class="hero-container">
+
+            <!-- Contenu gauche -->
+            <div class="hero-content">
+                <span class="hero-eyebrow">Christian MAMILO</span>
+
+                <h1>
+                    Faire progresser la communication
+                    à l'<span class="hero-title-accent">ère numérique</span>
+                </h1>
+
+                <p class="hero-description">
+                    Le défi des nouveaux communicateurs est de réconcilier la précision
+                    du digital avec la force émotionnelle des médias traditionnels. Dans
+                    un monde saturé de messages, la technologie n'est plus une fin, mais
+                    l'outil qui permet de rendre votre discours social enfin audible et
+                    mémorable.
+                </p>
+
+                <div class="hero-actions">
+                    <button routerLink="/articles" class="btn-primary">
+                        Explorer les articles
+                    </button>
+                    <button routerLink="/contact" class="btn-secondary">
+                        Contacter le Professeur
+                    </button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item" *ngFor="let stat of stats; let last = last">
+                        <span class="stat-value">{{ stat.value }}</span>
+                        <span class="stat-label">{{ stat.label }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visuel droite -->
+            <div class="hero-visual">
+                <div class="hero-image-frame">
+                    <div class="profile-image-container">
+                        <img src="/hero-mamilo.png" [alt]="author.name" class="profile-img" loading="eager" />
+                    </div>
+                    <div class="glow-effect glow-effect--top"></div>
+                    <div class="glow-effect glow-effect--bottom"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+       3. ARTICLES EN VEDETTE
+  ═══════════════════════════════════════════════ -->
+    <section class="featured-section animate-on-scroll">
+        <div class="section-container">
+
+            <div class="section-header animate-on-scroll" style="animation-delay: 0.1s">
+                <div class="section-heading">
+                    <span class="section-eyebrow">— PUBLICATIONS</span>
+                    <h2>Articles en vedette</h2>
+                    <p>
+                        Examens critiques des technologies et des dynamiques sociales qui
+                        façonnent notre paysage communicationnel commun.
+                    </p>
+                </div>
+                <a routerLink="/articles" class="link-more">
+                    Voir plus
+                    <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+                </a>
+            </div>
+
+            <div class="articles-grid">
+                <div *ngFor="let post of latestPosts(); let i = index" class="article-card animate-on-scroll"
+                    [style.animation-delay]="(0.2 + i * 0.1) + 's'">
+                    <div class="card-image">
+                        <img [src]="post.coverImage?.url" [alt]="post.title" loading="lazy" />
+                        <span class="category-badge">{{ post.category.name }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span>
+                                <lucide-icon name="calendar" [size]="13"></lucide-icon>
+                                {{ post.publishedAt | date:'d MMM yyyy' }}
+                            </span>
+                            <span>
+                                <lucide-icon name="clock" [size]="13"></lucide-icon>
+                                {{ post.readingTime }} min
+                            </span>
+                        </div>
+                        <h3 class="card-title">{{ post.title }}</h3>
+                        <p class="card-excerpt">{{ post.excerpt }}</p>
+                        <a [routerLink]="['/articles', post.slug]" class="read-more">
+                            Lire l'article
+                            <lucide-icon name="arrow-right" [size]="15"></lucide-icon>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+       4. THÉORIE & PRATIQUE (APPROCHE)
+  ═══════════════════════════════════════════════ -->
+    <section class="bridge-section animate-on-scroll">
+        <div class="bridge-container">
+
+            <!-- Texte -->
+            <div class="bridge-content animate-on-scroll" style="animation-delay: 0.1s">
+                <h2>
+                    Combler le fossé entre la théorie
+                    et la pratique professionnelle
+                </h2>
+                <p class="bridge-text">
+                    Avec plus de vingt ans de recherche en analyse du discours et en
+                    sociologie numérique, les travaux du Dr Christian Mamilo constituent une base
+                    solide pour les professionnels de la communication qui doivent
+                    naviguer dans la complexité des écosystèmes d'information modernes.
+                </p>
+
+                <div class="bridge-features">
+                    <div class="bridge-feature">
+                        <div class="feature-icon">
+                            <lucide-icon name="search" [size]="20"></lucide-icon>
+                        </div>
+                        <div class="feature-text">
+                            <h3>MÉTHODE RIGOUREUSE</h3>
+                            <p>Appuyé par des données quantitatives, enrichi qualitativement.</p>
+                        </div>
+                    </div>
+                    <div class="bridge-feature">
+                        <div class="feature-icon">
+                            <lucide-icon name="layout-grid" [size]="20"></lucide-icon>
+                        </div>
+                        <div class="feature-text">
+                            <h3>INTERDISCIPLINAIRE</h3>
+                            <p>Quand la linguistique rencontre la science des données.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bridge-actions">
+                    <button routerLink="/about" class="btn-primary">
+                        Profil académique
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grille d'images -->
+            <div class="bridge-visual-grid animate-on-scroll" style="animation-delay: 0.2s">
+                <div class="visual-circle"></div>
+                <div class="grid-column">
+                    <div class="grid-item item--horizontal">
+                        <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=800"
+                            alt="Writing in notebook" />
+                    </div>
+                    <div class="grid-item item--vertical">
+                        <img src="https://images.unsplash.com/photo-1549675584-91f19337af3d?auto=format&fit=crop&q=80&w=800"
+                            alt="Group meeting" />
+                    </div>
+                </div>
+                <div class="grid-column">
+                    <div class="grid-item item--tall">
+                        <img src="https://images.unsplash.com/photo-1507842217351-584c7d5270b1?auto=format&fit=crop&q=80&w=800"
+                            alt="Library aisle" />
+                    </div>
+                    <div class="grid-item item--horizontal">
+                        <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&q=80&w=800"
+                            alt="Writing in book" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+       5. DERNIERS ENGAGEMENTS (AGENDA)
+  ═══════════════════════════════════════════════ -->
+    <section class="engagements-section animate-on-scroll">
+        <div class="section-container">
+
+            <div class="section-header animate-on-scroll" style="animation-delay: 0.1s">
+                <div class="section-heading">
+                    <span class="section-eyebrow">— AGENDA</span>
+                    <h2>Derniers Engagements</h2>
+                    <p>
+                        Retrouvez-moi lors de diverses interventions publiques,
+                        conférences et séminaires partout dans le monde.
+                    </p>
+                </div>
+                <a routerLink="/events" class="link-more">
+                    Tout le calendrier
+                    <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+                </a>
+            </div>
+
+            <div class="engagements-list">
+                <div *ngFor="let event of latestEvents(); let i = index" class="engagement-card animate-on-scroll"
+                    [style.animation-delay]="(0.2 + i * 0.1) + 's'">
+                    <div class="engagement-card__image">
+                        <img [src]="event.coverImage?.url" [alt]="event.title" loading="lazy" />
+                    </div>
+
+                    <div class="engagement-card__body">
+                        <span class="engagement-card__type">
+                            {{ event?.type ?? 'Conférence Internationale' }}
+                        </span>
+                        <h3 class="engagement-card__title">{{ event.title }}</h3>
+                        <div class="engagement-card__meta">
+                            <span>
+                                <lucide-icon name="map-pin" [size]="13"></lucide-icon>
+                                {{ event.location.city }}, {{ event.location.country }}
+                            </span>
+                            <span>
+                                <lucide-icon name="calendar" [size]="13"></lucide-icon>
+                                {{ event.startDate | date:'d MMM yyyy' }}
+                            </span>
+                        </div>
+                        <p class="engagement-card__desc">{{ event.description }}</p>
+                    </div>
+
+                    <div class="engagement-card__action">
+                        <a [routerLink]="['/events', event.slug]" class="btn-outline-sm">En Savoir +</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+       6. NEWSLETTER CTA
+  ═══════════════════════════════════════════════ -->
+    <section class="newsletter-section animate-on-scroll">
+        <div class="newsletter-inner">
+            <div class="newsletter-content">
+                <h2>Rejoignez le réseau intellectuel</h2>
+                <p>
+                    Abonnez-vous pour recevoir chaque mois des résumés des nouvelles
+                    recherches, des enregistrements d'événements et des recommandations
+                    de livres directement du Dr Mamilo.
+                </p>
+            </div>
+            <div class="newsletter-action-area">
+                <form class="newsletter-form" (submit)="$event.preventDefault()">
+                    <input type="email" placeholder="Entrez votre email académique" class="newsletter-input" />
+                    <button type="submit" class="btn-newsletter">
+                        Rejoindre
+                    </button>
+                </form>
+                <p class="newsletter-privacy">
+                    Nous respectons votre vie privée. Votre adresse ne sera jamais communiquée à des tiers.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+       2. PARTENAIRES MÉDIAS
+  ═══════════════════════════════════════════════ -->
+    <section class="partners-section">
+        <div class="partners-inner">
+            <p class="partners-label">RECONNU ET PUBLIÉ PAR</p>
+            <div class="partners-grid">
+                <span *ngFor="let partner of mediaPartners" class="partner-name">{{ partner }}</span>
+            </div>
+        </div>
+    </section>
+
+</div>

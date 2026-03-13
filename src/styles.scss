@@ -1,0 +1,78 @@
+@use 'styles/abstracts/variables' as *;
+@use 'styles/abstracts/mixins' as *;
+@use 'styles/base/base';
+@use 'styles/base/components';
+
+// CSS Custom Properties - Mamilo Insights Design Tokens
+:root {
+  // Colors
+  --color-primary: #{$primary};
+  --color-navy: #{$navy};
+  --color-gold: #{$gold};
+  --color-accent: #{$accent};
+  --color-white: #{$white};
+  --color-slate-50: #{$slate-50};
+  --color-slate-100: #{$slate-100};
+  --color-slate-200: #{$slate-200};
+  --color-slate-300: #{$slate-300};
+  --color-slate-400: #{$slate-400};
+  --color-slate-500: #{$slate-500};
+  --color-slate-600: #{$slate-600};
+  --color-slate-700: #{$slate-700};
+  --color-slate-800: #{$slate-800};
+
+  // Typography
+  --font-display: #{$font-display};
+  --font-serif: #{$font-serif};
+  --font-sans: #{$font-sans};
+
+  // Spacing
+  --spacing-section: #{$section-padding};
+  --spacing-element: #{$element-padding};
+  --navbar-height: #{$navbar-height};
+
+  // Transitions
+  --transition-fast: #{$transition-fast};
+  --transition-medium: #{$transition-medium};
+
+  // Breakpoints (for JavaScript usage)
+  --breakpoint-mobile: #{$breakpoint-mobile};
+  --breakpoint-tablet: #{$breakpoint-tablet};
+  --breakpoint-engagement-mobile: #{$breakpoint-engagement-mobile};
+}
+
+// Global Animations
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+// Fade-in Animation for page transitions
+.fade-in {
+  animation: fadeIn 0.7s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

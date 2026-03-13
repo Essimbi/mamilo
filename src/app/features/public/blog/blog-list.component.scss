@@ -1,0 +1,124 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.blog-list-container {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.blog-header {
+    background-color: $navy;
+    color: $white;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+
+    .header-content {
+        @include container;
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: $white;
+            font-family: $font-sans;
+        }
+
+        p {
+            color: $slate-300;
+            font-size: 1.25rem;
+            font-family: $font-serif;
+            max-width: 42rem;
+            line-height: 1.625;
+        }
+    }
+}
+
+.content-section {
+    @include container;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.filters-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid $slate-100;
+    padding-bottom: 2rem;
+
+    .filter-btn {
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background-color: $slate-100;
+        color: $slate-600;
+
+        &:hover {
+            background-color: $slate-200;
+        }
+
+        &.active {
+            background-color: $navy;
+            color: $white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.posts-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+.empty-state {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    text-align: center;
+
+    lucide-icon {
+        margin-left: auto;
+        margin-right: auto;
+        color: $slate-300;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $slate-400;
+    }
+}
+
+.loading-skeleton {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+    .skeleton-item {
+        height: 16rem;
+        background-color: $slate-100;
+        border-radius: 1rem;
+        width: 100%;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}

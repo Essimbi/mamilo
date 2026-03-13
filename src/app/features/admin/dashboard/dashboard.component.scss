@@ -1,0 +1,88 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.dashboard-page {
+    padding: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+
+    .header-content {
+        h1 {
+            font-family: $font-serif;
+            font-size: 2rem;
+            color: $navy;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: $slate-400;
+            margin: 0;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+
+    @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include desktop {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @include desktop {
+        grid-template-columns: 1fr 340px;
+    }
+}
+
+// Global button styles for admin
+.btn-primary {
+    @include btn-primary;
+    padding: 0.75rem 1.5rem;
+    background-color: $navy;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-outline {
+    @include btn-outline;
+    padding: 0.75rem 1.5rem;
+    border-color: $slate-200;
+    color: $slate-600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+
+    &:hover {
+        background-color: $slate-50;
+        border-color: $slate-300;
+    }
+}

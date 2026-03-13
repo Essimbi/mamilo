@@ -1,0 +1,14 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #fcfdfe; // Very light neutral background
+}
+
+.admin-main {
+    flex: 1;
+    padding: 0;
+    overflow-y: auto;
+}

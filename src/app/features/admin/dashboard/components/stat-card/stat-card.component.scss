@@ -1,0 +1,84 @@
+@use '../../../../../../styles/abstracts/variables' as *;
+@use '../../../../../../styles/abstracts/mixins' as *;
+
+.stat-card {
+    background-color: $white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba($slate-100, 0.5);
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $slate-400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.stat-value {
+    font-family: $font-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: $navy;
+    margin: 0;
+}
+
+.stat-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+
+    &.up {
+        background-color: #f0fdf4;
+        color: #16a34a;
+    }
+
+    &.down {
+        background-color: #fef2f2;
+        color: #dc2626;
+    }
+
+    &.stable {
+        background-color: #f8fafc;
+        color: $slate-500;
+    }
+}
+
+.stat-meta {
+    font-size: 0.75rem;
+    color: $slate-400;
+    margin: 0.5rem 0 0;
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $medium-blue;
+    background-color: #f0f7ff;
+}

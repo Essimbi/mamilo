@@ -1,0 +1,427 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.contact-page {
+    background-color: $white;
+    color: $slate-800;
+    min-height: 100vh;
+}
+
+.container {
+    @include container;
+    max-width: 1200px;
+}
+
+// ═══════════════════════════════════════════════
+// 1. HERO SECTION
+// ═══════════════════════════════════════════════
+
+.contact-hero {
+    padding: 6rem 0 4rem;
+    text-align: center;
+
+    h1 {
+        font-family: $font-serif;
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        color: $navy;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+
+        span {
+            color: $medium-blue;
+        }
+    }
+
+    .hero-subtitle {
+        max-width: 600px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: $slate-500;
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 2. MAIN GRID
+// ═══════════════════════════════════════════════
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    padding-bottom: 8rem;
+
+    @include desktop {
+        grid-template-columns: 1.4fr 1fr;
+        gap: 6rem;
+    }
+}
+
+// LEFT COLUMN
+.contact-column-left {
+    .form-wrapper {
+        margin-bottom: 3rem;
+
+        h3 {
+            font-family: $font-serif;
+            font-size: 1.5rem;
+            color: $navy;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .form-desc {
+            font-size: 0.95rem;
+            color: $slate-400;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+    }
+
+    .contact-form {
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+
+            @include tablet {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+
+            label {
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: $slate-700;
+                margin-bottom: 0.6rem;
+            }
+
+            input,
+            textarea {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 1px solid $slate-200;
+                border-radius: 4px;
+                font-size: 0.95rem;
+                color: $slate-800;
+                background-color: #fcfdfe;
+                transition: all 0.2s;
+
+                &::placeholder {
+                    color: $slate-300;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: $medium-blue;
+                    box-shadow: 0 0 0 3px rgba($medium-blue, 0.05);
+                }
+            }
+
+            textarea {
+                min-height: 200px;
+                resize: vertical;
+            }
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background-color: $navy;
+            color: $white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover {
+                background-color: darken($navy, 5%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba($navy, 0.3);
+            }
+        }
+    }
+
+    .response-norms {
+        margin-top: 4rem;
+        background-color: #f1f6ff;
+        padding: 2.5rem;
+        border-radius: 8px;
+
+        .norms-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: $medium-blue;
+
+            h3 {
+                font-family: $font-serif;
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin: 0;
+            }
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                position: relative;
+                padding-left: 1.5rem;
+                font-size: 0.9rem;
+                color: $slate-600;
+                margin-bottom: 1rem;
+                line-height: 1.5;
+
+                &::before {
+                    content: '•';
+                    position: absolute;
+                    left: 0;
+                    color: $medium-blue;
+                    font-weight: 700;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}
+
+// RIGHT COLUMN
+.contact-column-right {
+    .info-section {
+        margin-bottom: 4rem;
+
+        h3 {
+            font-family: $font-serif;
+            font-size: 1.5rem;
+            color: $navy;
+            margin-bottom: 2.5rem;
+            font-weight: 700;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 1.5rem;
+
+            .info-icon {
+                width: 40px;
+                height: 40px;
+                background-color: #f1f6ff;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: $medium-blue;
+                flex-shrink: 0;
+            }
+
+            .info-content {
+                .info-label-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                .info-title {
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: $navy;
+                }
+
+                .badge-pref {
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    padding: 0.2rem 0.6rem;
+                    background-color: #e2e8f0;
+                    color: $slate-600;
+                    border-radius: 10px;
+                    text-transform: uppercase;
+                }
+
+                .info-value {
+                    font-size: 1rem;
+                    color: $slate-500;
+                    line-height: 1.6;
+                    margin: 0;
+                }
+            }
+        }
+    }
+
+    .location-section {
+        h3 {
+            font-family: $font-serif;
+            font-size: 1.5rem;
+            color: $navy;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .map-placeholder {
+            background-color: #f3f4f7;
+            border-radius: 12px;
+            padding: 3rem 1.5rem 1.5rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .map-card {
+            background-color: $white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+
+            .pin-icon {
+                color: $medium-blue;
+                flex-shrink: 0;
+            }
+
+            strong {
+                display: block;
+                font-size: 0.95rem;
+                color: $navy;
+                margin-bottom: 0.25rem;
+            }
+
+            p {
+                font-size: 0.85rem;
+                color: $slate-500;
+                margin: 0;
+                line-height: 1.4;
+            }
+        }
+
+        .map-footer {
+            text-align: right;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: $slate-300;
+            letter-spacing: 0.1em;
+            margin-top: 2rem;
+        }
+
+        .location-note {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            color: $slate-500;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            align-items: center;
+
+            lucide-icon {
+                flex-shrink: 0;
+                color: $slate-300;
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════
+// 3. NEWSLETTER SECTION
+// ═══════════════════════════════════════════════
+
+.newsletter-footer {
+    padding: 8rem 0;
+    background-color: $navy;
+    color: $white;
+    text-align: center;
+
+    .center-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    h2 {
+        font-family: $font-serif;
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: rgba($white, 0.7);
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+
+    .newsletter-form-inline {
+        display: flex;
+        gap: 0.5rem;
+        max-width: 500px;
+        margin: 0 auto;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+        }
+
+        input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba($white, 0.1);
+            background-color: rgba($white, 0.05);
+            color: $white;
+            font-size: 1rem;
+
+            &::placeholder {
+                color: rgba($white, 0.3);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: $medium-blue;
+            }
+        }
+
+        .btn-subscribe {
+            padding: 1rem 2rem;
+            background-color: $white;
+            color: $navy;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background-color: $slate-50;
+                transform: translateY(-2px);
+            }
+        }
+    }
+}

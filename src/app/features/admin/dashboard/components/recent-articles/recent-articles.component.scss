@@ -1,0 +1,165 @@
+@use '../../../../../../styles/abstracts/variables' as *;
+@use '../../../../../../styles/abstracts/mixins' as *;
+
+.card {
+    background-color: $white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    border: 1px solid $slate-50;
+    overflow: hidden;
+}
+
+.recent-articles {
+    .card-header {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid $slate-50;
+
+        h3 {
+            font-family: $font-serif;
+            font-size: 1.25rem;
+            color: $navy;
+            margin-bottom: 0.25rem;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: $slate-400;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .link-action {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $medium-blue;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        text-align: left;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: $slate-400;
+        text-transform: uppercase;
+        border-bottom: 2px solid $slate-50;
+    }
+
+    td {
+        padding: 1.25rem 1.5rem;
+        font-size: 0.9rem;
+        color: $slate-700;
+        border-bottom: 1px solid $slate-50;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .post-title {
+        font-weight: 600;
+        color: $navy;
+    }
+
+    .badge-category {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        background-color: #f1f5f9;
+        color: $slate-600;
+
+        &.science-politique {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        &.linguistique {
+            background-color: #f0fdf4;
+            color: #15803d;
+        }
+
+        &.education {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+
+        &.technologie {
+            background-color: #f5f3ff;
+            color: #6d28d9;
+        }
+
+        &.architecture {
+            background-color: #fff7ed;
+            color: #c2410c;
+        }
+    }
+
+    .status-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: $slate-300;
+
+        &.published {
+            background-color: #16a34a;
+        }
+
+        &.draft {
+            background-color: $slate-400;
+        }
+    }
+
+    .date-text {
+        color: $slate-400;
+        font-family: monospace;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: $slate-400;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: $slate-50;
+        color: $navy;
+    }
+}
