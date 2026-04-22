@@ -1,6 +1,4 @@
 import { MediaAsset } from './user.model';
-import { Post } from './post.model';
-
 export type EventType = string;
 
 export interface Event {

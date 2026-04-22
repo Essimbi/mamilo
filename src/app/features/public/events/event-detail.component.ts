@@ -45,7 +45,7 @@ import { FormsModule } from '@angular/forms';
           <!-- Left Column: Main Content -->
           <main class="main-column">
             <section class="about-section">
-              <span class="section-badge">À propos</span>
+              <!-- <span class="section-badge">À propos</span> -->
               <h2 class="section-title">À propos de l'événement</h2>
               <div class="event-full-description" [innerHTML]="event.description"></div>
             </section>
@@ -100,14 +100,18 @@ import { FormsModule } from '@angular/forms';
               </div>
               
               <div class="comments-list" *ngIf="event.comments && event.comments.length > 0; else noComments">
-                <div class="comment-item" *ngFor="let comment of event.comments; trackBy: trackByComment">
+                <div class="comment-item" *ngFor="let comment of event.comments; trackBy: trackByComment"
+                     [ngClass]="{'admin-comment': isAdminComment(comment), 'visitor-comment': !isAdminComment(comment)}">
                   <div class="comment-avatar">
-                    <img [src]="comment.author_avatar || 'assets/images/mock/avatar.jpg'" [alt]="comment.author_name">
+                    <img *ngIf="hasValidAvatar(comment.author_avatar); else fallbackInitial" [src]="comment.author_avatar" [alt]="comment.author_name">
+                    <ng-template #fallbackInitial>
+                      <div class="avatar-initial">{{ (comment.author_name || 'A').charAt(0) }}</div>
+                    </ng-template>
                   </div>
                   <div class="comment-content-wrap">
                     <div class="comment-header">
                       <span class="comment-author">{{ comment.author_name }}</span>
-                      <span class="comment-date">{{ comment.created_at | date:'longDate':'':'fr' }}</span>
+                      <span class="comment-date">{{ comment.created_at | date:'longDate' }}</span>
                     </div>
                     <p class="comment-text">{{ comment.content }}</p>
                   </div>
@@ -124,18 +128,6 @@ import { FormsModule } from '@angular/forms';
 
           <!-- Right Column: Sidebar -->
           <aside class="sidebar-column">
-            <!-- Registration Card -->
-            <div class="registration-card">
-              <h3 class="reg-title">Inscrivez-vous maintenant</h3>
-              <p class="reg-text">Réservez votre place pour cet événement.</p>
-              <div class="event-date-box">
-                <lucide-icon name="calendar" size="16"></lucide-icon>
-                <span>{{ event.eventDate | date:'fullDate':'':'fr' }}</span>
-              </div>
-              <button class="register-button" [disabled]="event.status === 'past'" [class.disabled]="event.status === 'past'">
-                {{ event.status === 'past' ? 'Événement passé' : 'Terminer l\\'inscription' }}
-              </button>
-            </div>
 
             <!-- Related Events -->
             <div class="related-events-box" *ngIf="relatedEvents().length > 0">
@@ -143,7 +135,7 @@ import { FormsModule } from '@angular/forms';
               <div class="related-list">
                 <div class="related-item" *ngFor="let rel of relatedEvents(); trackBy: trackByIndex" [routerLink]="['/events', rel.slug]">
                   <div class="date-mini">
-                    <span class="mini-month">{{ rel.eventDate | date:'MMM':'':'fr' }}</span>
+                    <span class="mini-month">{{ rel.eventDate | date:'MMM' }}</span>
                     <span class="mini-day">{{ rel.eventDate | date:'dd' }}</span>
                   </div>
                   <div class="related-info">
@@ -193,11 +185,11 @@ export class EventDetailComponent implements OnInit {
    }
 
    private loadRelatedEvents() {
-      this.contentService.getEvents('upcoming').subscribe(events => {
-         const currentId = this.event()?.id;
-         this.relatedEvents.set(events.filter(e => e.id !== currentId).slice(0, 3));
-      });
-   }
+    this.contentService.getEvents({ status: 'upcoming' }).subscribe(events => {
+      // Exclude current event
+      this.relatedEvents.set(events.filter(e => e.id !== this.event()?.id).slice(0, 3));
+    });
+  }
 
    onLike(id: string) {
       if (this.hasLiked()) return;
@@ -214,12 +206,26 @@ export class EventDetailComponent implements OnInit {
       });
    }
 
+   hasValidAvatar(avatar: string | null | undefined): boolean {
+    if (!avatar) return false;
+    if (avatar.includes('assets/images/mock/avatar.jpg')) return false;
+    return true;
+  }
+
+  isPastEvent(eventDate: Date | string): boolean {
+    return new Date(eventDate) < new Date();
+  }
+
+  isAdminComment(comment: any): boolean {
+    return comment?.author_name?.toLowerCase().includes('mamilo') || comment?.author_name === 'Christian Mamilo';
+  }
+
    onSubmitComment(eventId: string) {
       if (!this.newComment.trim()) return;
       
       const commentText = this.newComment.trim();
       // Use the generic addComment for events if applicable, or we use store
-      this.contentStore.addComment(eventId, commentText).subscribe({
+      this.contentStore.addEventComment(eventId, commentText).subscribe({
          next: (newCommentData) => {
             this.newComment = '';
             this.toastService.success('Votre question a été posée avec succès !');

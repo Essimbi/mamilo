@@ -249,7 +249,7 @@ import { LucideAngularModule, Clock, Calendar, User, Heart, MessageSquare } from
         </div>
 
         <h3 class="card-title">
-          <a [routerLink]="['/blog', post.slug]">
+          <a [routerLink]="['/articles', post.slug]">
             {{ post.title }}
           </a>
         </h3>

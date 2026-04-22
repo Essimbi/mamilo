@@ -90,9 +90,11 @@ export class ContentMockService implements IContentService {
         return of(posts).pipe(delay(500));
     }
 
-    getEvents(status?: 'upcoming' | 'past'): Observable<Event[]> {
+    getEvents(filters?: { type?: string; status?: string; limit?: number }): Observable<Event[]> {
         let list = [...this.events];
-        if (status) list = list.filter(e => e.status === status);
+        if (filters?.status) list = list.filter(e => e.status === filters.status);
+        if (filters?.type) list = list.filter(e => e.type === filters.type);
+        if (filters?.limit) list = list.slice(0, filters.limit);
         return of(list).pipe(delay(400));
     }
 
@@ -365,6 +367,18 @@ export class ContentMockService implements IContentService {
         this.posts[index].comments = [...this.posts[index].comments || [], newComment];
         this.saveToStorage(this.STORAGE_KEY, this.posts);
         return of(newComment).pipe(delay(400));
+    }
+
+    addEventComment(event_id: string, comment: any): Observable<any> {
+        const newC = {
+            id: `ec_${Date.now()}`,
+            eventId: event_id,
+            authorName: comment.author_name || 'Anonyme',
+            authorAvatar: comment.author_avatar || '',
+            content: comment.content,
+            createdAt: new Date().toISOString()
+        };
+        return of(newC).pipe(delay(500));
     }
 
     subscribeNewsletter(email: string): Observable<any> {

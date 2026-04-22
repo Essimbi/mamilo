@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ElementRef, PLATFORM_ID, HostListener, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, PLATFORM_ID, HostListener, AfterViewInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SeoService } from '../../../core/services/seo.service';
 import { GlobalStateService } from '../../../core/services/global-state.service';
@@ -158,22 +158,18 @@ import { Router, RouterModule } from '@angular/router';
           </div>
 
           <div class="publications-grid">
-            <div class="pub-card" *ngFor="let i of [1,2,3,4,5,6]">
-              <div class="pub-type">{{ i % 2 === 0 ? 'Article' : 'Livre' }}</div>
-              <div class="pub-year">202{{ 4-i }}</div>
+            <div class="pub-card" *ngFor="let post of recentArticles(); let i = index">
+              <div class="pub-type">Article</div>
+              <div class="pub-year">{{ post.publishedAt | date:'yyyy' }}</div>
               <h3 class="pub-title">
-                {{ i === 1 ? 'Folies numériques : l’avenir des médias' : 
-                   i === 2 ? 'Etude algorithmique dans les prévisions du marché' : 
-                   i === 3 ? 'Effets psychologiques du défilement infini' : 
-                   i === 4 ? 'La vie privée à l’ère de la surveillance' : 
-                   i === 5 ? 'Le moi en réseau' : 'Les médias sociaux et le déclin de la confiance civique' }}
+                {{ post.title }}
               </h3>
               <p class="pub-publisher">
-                {{ i % 2 === 0 ? 'Journal of Digital Psychology' : 'Stanford Academic Press' }}
+                {{ post.category?.name || 'Publication' }}
               </p>
-              <a [href]="'https://scholar.google.com/scholar?q=' + i" target="_blank" class="pub-link">
-                 DOI
-                 <lucide-icon name="external-link" size="12"></lucide-icon>
+              <a [routerLink]="['/articles', post.slug]" class="pub-link">
+                 Lire l'article
+                 <lucide-icon name="arrow-right" size="12"></lucide-icon>
               </a>
             </div>
           </div>
@@ -195,65 +191,34 @@ import { Router, RouterModule } from '@angular/router';
             <div class="divider-line"></div>
           </div>
 
-          <div class="featured-engagements">
-            <div class="eng-featured-card">
-              <div class="eng-card-left keynote">
+          <div class="featured-engagements" *ngIf="pastEvents().length">
+            <div class="eng-featured-card" *ngFor="let event of pastEvents()">
+              <div [class]="'eng-card-left ' + (event.type === 'Keynotes' ? 'keynote' : 'symposium')">
                 <div class="eng-icon-box">
-                  <lucide-icon name="mic" size="28" strokeWidth="1.5"></lucide-icon>
-                  <span class="eng-type">KEYNOTE</span>
+                  <lucide-icon [name]="event.type === 'Keynotes' ? 'mic' : 'globe'" size="28" strokeWidth="1.5"></lucide-icon>
+                  <span class="eng-type">{{ event.type | uppercase }}</span>
                 </div>
-                <div class="eng-year">2024</div>
+                <div class="eng-year">{{ event.eventDate | date:'yyyy' }}</div>
               </div>
               <div class="eng-info">
-                <h4>Forum mondial sur l'éthique de l'IA</h4>
-                <p class="location-text">Stockholm, Sweden</p>
-                <p class="desc">Présentation du discours d'ouverture sur le thème « La souveraineté du silence : la vie privée dans une économie toujours connectée ». </p>
-              </div>
-            </div>
-            
-            <div class="eng-featured-card">
-              <div class="eng-card-left symposium">
-                <div class="eng-icon-box">
-                    <lucide-icon name="globe" size="28" strokeWidth="1.5"></lucide-icon>
-                    <span class="eng-type">SYMPOSIUM</span>
-                </div>
-                <div class="eng-year">2023</div>
-              </div>
-              <div class="eng-info">
-                <h4>Sommet sur la démocratie numérique</h4>
-                <p class="location-text">Washington D.C., USA</p>
-                <p class="desc">J'ai animé une table ronde sur le thème « Combattre la désinformation d'État dans les relations transatlantiques ». </p>
+                <h4>{{ event.title }}</h4>
+                <p class="location-text">{{ event.location }}</p>
+                <p class="desc">{{ (event.description | slice:0:100) + '...' }}</p>
               </div>
             </div>
           </div>
 
-          <div class="upcoming-seminars">
-            <div class="seminar-header">
+          <div class="upcoming-seminars" *ngIf="upcomingEvents().length">
+            <!-- <div class="seminar-header">
                 <lucide-icon name="calendar" size="18" class="text-blue-600"></lucide-icon>
-                <h3>Séminaires académiques à venir</h3>
-            </div>
+                <h3>Évènements à venir</h3>
+            </div> -->
             <div class="seminar-list">
-                <div class="seminar-row">
-                    <span class="seminar-date">Oct 12, 2024</span>
-                    <span class="seminar-title">Colloque d'études médiatiques</span>
+                <div class="seminar-row" *ngFor="let event of upcomingEvents()" style="cursor: pointer" [routerLink]="['/events', event.slug]">
+                    <span class="seminar-date">{{ event.eventDate | date:'MMM dd, yyyy' }}</span>
+                    <span class="seminar-title">{{ event.title }}</span>
                     <div class="seminar-end">
-                        <span class="seminar-venue">En ligne / Université de Berlin</span>
-                        <lucide-icon name="chevron-right" size="16"></lucide-icon>
-                    </div>
-                </div>
-                <div class="seminar-row">
-                    <span class="seminar-date">Nov 05, 2024</span>
-                    <span class="seminar-title">Atelier sur l'avenir du journalisme</span>
-                    <div class="seminar-end">
-                        <span class="seminar-venue">London, UK</span>
-                        <lucide-icon name="chevron-right" size="16"></lucide-icon>
-                    </div>
-                </div>
-                <div class="seminar-row">
-                    <span class="seminar-date">Dec 14, 2024</span>
-                    <span class="seminar-title">Séminaire de recherche doctorale</span>
-                    <div class="seminar-end">
-                        <span class="seminar-venue">Metropolitan University</span>
+                        <span class="seminar-venue">{{ event.location }}</span>
                         <lucide-icon name="chevron-right" size="16"></lucide-icon>
                     </div>
                 </div>
@@ -267,7 +232,7 @@ import { Router, RouterModule } from '@angular/router';
         <div class="container">
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-value">120<span>+</span></div>
+              <div class="stat-value">{{ state.posts().length }}<span>+</span></div>
               <div class="stat-label">ARTICLES PUBLIÉS</div>
             </div>
             <div class="stat-card">
@@ -275,8 +240,8 @@ import { Router, RouterModule } from '@angular/router';
               <div class="stat-label">CITATIONS</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">04</div>
-              <div class="stat-label">LIVRES PUBLIÉS</div>
+              <div class="stat-value">{{ state.events().length }}</div>
+              <div class="stat-label">ÉVÉNEMENTS</div>
             </div>
             <div class="stat-card">
               <div class="stat-value">22</div>
@@ -295,15 +260,20 @@ import { Router, RouterModule } from '@angular/router';
     `
 })
 export class AboutComponent implements OnInit, AfterViewInit {
-  private state = inject(GlobalStateService);
+  state = inject(GlobalStateService);
   private seoService = inject(SeoService);
   private elementRef = inject(ElementRef);
   private platformId = inject(PLATFORM_ID);
+  private contentService = inject(IContentService);
 
   author = this.state.user;
   settings = this.state.settings;
   isBrowser: boolean;
   authorVal: any | null = null;
+  
+  recentArticles = this.state.posts; // We can load slice(0, 6) or limit directly
+  upcomingEvents = signal<any[]>([]);
+  pastEvents = signal<any[]>([]);
 
 
   constructor(private router: Router) {
@@ -321,6 +291,14 @@ export class AboutComponent implements OnInit, AfterViewInit {
       s?.site_description || 'Découvrez le Dr. ' + (this.author()?.name || 'Christian Mamilo'),
       ['expert', 'parcours', 'about', 'mamilo']
     );
+
+    // Initial slice on global state if needed, but it's simpler to fetch right amounts:
+    this.contentService.getPosts({}, { page: 1, limit: 6 }).subscribe(res => {
+      // In case we want to overwrite state, but usually we just bind it to local signal if we want a smaller slice
+      // Or we can just use computed
+    });
+    this.contentService.getEvents({ status: 'upcoming', limit: 3 }).subscribe(res => this.upcomingEvents.set(res));
+    this.contentService.getEvents({ status: 'past', limit: 2 }).subscribe(res => this.pastEvents.set(res));
   }
 
   onContact() {

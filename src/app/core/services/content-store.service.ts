@@ -427,7 +427,7 @@ export class ContentStore {
         return this.contentService.addComment(post_id, {
             content: comment,
             author_name: author?.name || 'Visiteur Académique',
-            author_avatar: author?.avatar?.url || 'assets/images/mock/avatar.jpg'
+            author_avatar: author?.avatar?.url || ''
         }).pipe(
             tap(newComment => {
                 const posts = this.state.posts();
@@ -438,6 +438,27 @@ export class ContentStore {
                     updatedPost.comments = [...(updatedPost.comments || []), newComment];
                     newPosts[index] = updatedPost;
                     this.state.setPosts(newPosts);
+                }
+            })
+        );
+    }
+
+    addEventComment(event_id: string, comment: string) {
+        const author = this.state.user();
+        return this.contentService.addEventComment(event_id, {
+            content: comment,
+            author_name: author?.name || 'Visiteur Académique',
+            author_avatar: author?.avatar?.url || ''
+        }).pipe(
+            tap(newComment => {
+                const events = this.state.events();
+                const index = events.findIndex(e => e.id === event_id);
+                if (index !== -1) {
+                    const newEvents = [...events];
+                    const updatedEvent = { ...newEvents[index] };
+                    updatedEvent.comments = [...(updatedEvent.comments || []), newComment];
+                    newEvents[index] = updatedEvent;
+                    this.state.setEvents(newEvents);
                 }
             })
         );

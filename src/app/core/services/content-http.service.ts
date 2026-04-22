@@ -97,10 +97,13 @@ export class ContentHttpService extends IContentService {
             .pipe(map(res => this.mapPost(res.data)));
     }
 
-    getEvents(status?: 'upcoming' | 'past'): Observable<Event[]> {
+    getEvents(filters?: { type?: string; status?: string; limit?: number }): Observable<Event[]> {
         let params = new HttpParams();
-        if (status) params = params.set('status', status);
-        return this.http.get<{ success: boolean; data: Event[] }>(`${this.API_URL}/events`, { params })
+        if (filters?.status) params = params.set('status', filters.status);
+        if (filters?.type) params = params.set('type', filters.type);
+        if (filters?.limit) params = params.set('limit', filters.limit.toString());
+        
+        return this.http.get<{ success: boolean; data: Event[]; message: string }>(`${this.API_URL}/events`, { params })
             .pipe(map(res => (res.data || []).map(e => this.mapEvent(e))));
     }
 
@@ -320,6 +323,11 @@ export class ContentHttpService extends IContentService {
 
     addComment(post_id: string, comment: any): Observable<any> {
         return this.http.post<{ success: boolean; data: any; message: string }>(`${this.API_URL}/articles/${post_id}/comments`, comment)
+            .pipe(map(res => res.data));
+    }
+
+    addEventComment(event_id: string, comment: any): Observable<any> {
+        return this.http.post<{ success: boolean; data: any; message: string }>(`${this.API_URL}/events/${event_id}/comments`, comment)
             .pipe(map(res => res.data));
     }
 

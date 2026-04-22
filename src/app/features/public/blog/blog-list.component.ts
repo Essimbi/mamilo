@@ -37,14 +37,14 @@ import { IContentService } from '../../../core/services/content.interface';
         <!-- Tabs Filters -->
         <div class="filters-wrapper">
           <button 
-            *ngFor="let type of types; trackBy: trackByType"
+            *ngFor="let category of categories(); trackBy: trackByCategory"
             [routerLink]="[]"
-            [queryParams]="{ type: type.value === 'all' ? null : type.value }"
+            [queryParams]="{ category: category.slug === 'all' ? null : category.slug }"
             queryParamsHandling="merge"
-            [class.active]="activeType() === type.value"
+            [class.active]="activeCategory() === category.slug"
             class="filter-btn"
           >
-            {{ type.label }}
+            {{ category.name }}
           </button>
         </div>
 
@@ -77,17 +77,11 @@ export class BlogListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  activeType = signal<string>('all');
+  activeCategory = signal<string>('all');
   activeSearch = signal<string>('');
 
   posts$!: Observable<Post[]>;
-
-  types = [
-    { label: 'Tous', value: 'all' },
-    { label: 'Articles', value: 'article' },
-    { label: 'Notes d\'intention', value: 'note' },
-    { label: 'Récaps', value: 'recap' }
-  ];
+  categories = signal<any[]>([{ slug: 'all', name: 'Tous' }]);
 
   ngOnInit(): void {
     const s = this.state.settings();
@@ -98,17 +92,20 @@ export class BlogListComponent implements OnInit {
     );
 
     this.route.queryParams.subscribe(params => {
-      this.activeType.set(params['type'] || 'all');
+      this.activeCategory.set(params['category'] || 'all');
       this.activeSearch.set(params['search'] || '');
+    });
+
+    this.contentService.getCategories().subscribe(res => {
+      this.categories.set([{ slug: 'all', name: 'Tous' }, ...res]);
     });
 
     this.posts$ = this.route.queryParams.pipe(
       switchMap(params => {
         const filters: any = {};
-        if (params['category']) filters.category = params['category'];
+        if (params['category'] && params['category'] !== 'all') filters.category = params['category'];
         if (params['tag']) filters.tag = params['tag'];
         if (params['search']) filters.search = params['search'];
-        if (params['type'] && params['type'] !== 'all') filters.type = params['type'];
         
         return this.contentService.getPosts(filters).pipe(map(res => res.items));
       })
@@ -126,5 +123,5 @@ export class BlogListComponent implements OnInit {
   }
 
   trackByPost(_: number, post: any) { return post.id; }
-  trackByType(_: number, type: any) { return type.value; }
+  trackByCategory(_: number, category: any) { return category.slug; }
 }

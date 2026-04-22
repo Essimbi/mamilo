@@ -170,10 +170,14 @@ import { ToastService } from '../../../core/services/toast.service';
             </div>
           </div>
           <div class="comments-list">
-             <div *ngFor="let comment of post.comments || []; trackBy: trackByComment" class="comment-item">
+             <div *ngFor="let comment of post.comments || []; trackBy: trackByComment" 
+                  class="comment-item" 
+                  [ngClass]="{'admin-comment': isAdminComment(comment), 'visitor-comment': !isAdminComment(comment)}">
                <div class="comment-avatar-wrapper">
-                 <img *ngIf="comment.authorAvatar" [src]="comment.authorAvatar" class="comment-avatar" [alt]="comment.authorName">
-                 <div *ngIf="!comment.authorAvatar" class="avatar-initial">{{ (comment.authorName || 'A').charAt(0) }}</div>
+                 <img *ngIf="hasValidAvatar(comment.authorAvatar); else fallbackInitial" [src]="comment.authorAvatar" class="comment-avatar" [alt]="comment.authorName">
+                 <ng-template #fallbackInitial>
+                   <div class="avatar-initial">{{ (comment.authorName || 'A').charAt(0) }}</div>
+                 </ng-template>
                </div>
                <div class="comment-content">
                  <div class="comment-header">
@@ -317,5 +321,15 @@ export class ArticleDetailComponent implements OnInit {
   }
 
   trackByTag(_: number, tag: any) { return tag.name; }
-  trackByComment(_: number, comment: any) { return comment.id; }
+  hasValidAvatar(avatar: string | null | undefined): boolean {
+    if (!avatar) return false;
+    if (avatar.includes('assets/images/mock/avatar.jpg')) return false;
+    return true;
+  }
+
+  isAdminComment(comment: any): boolean {
+    return comment?.authorName?.toLowerCase().includes('mamilo') || comment?.authorName === 'Christian Mamilo';
+  }
+
+  trackByComment(index: number, comment: any): string { return comment.id; }
 }

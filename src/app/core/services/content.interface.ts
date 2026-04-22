@@ -21,7 +21,7 @@ export interface PaginationParams {
 export abstract class IContentService {
     abstract getPosts(filters?: PostFilters, pagination?: PaginationParams): Observable<{ items: Post[], total: number }>;
     abstract getPostBySlug(slug: string): Observable<Post | null>;
-    abstract getEvents(status?: 'upcoming' | 'past'): Observable<Event[]>;
+    abstract getEvents(filters?: { type?: string; status?: string; limit?: number }): Observable<Event[]>;
     abstract getEventBySlug(slug: string): Observable<Event | null>;
     abstract getCategories(): Observable<Category[]>;
     abstract getCategoryBySlug(slug: string): Observable<Category | null>;
@@ -63,6 +63,7 @@ export abstract class IContentService {
     abstract likePost(id: string): Observable<number>;
     abstract likeEvent(id: string): Observable<number>;
     abstract addComment(post_id: string, comment: any): Observable<any>;
+    abstract addEventComment(event_id: string, comment: any): Observable<any>;
     
     // New Public Actions
     abstract subscribeNewsletter(email: string): Observable<any>;

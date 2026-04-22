@@ -1,10 +1,13 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { GlobalStateService } from '../../../core/services/global-state.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { Event } from '../../../core/models/event.model';
 import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-angular';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { IContentService } from '../../../core/services/content.interface';
 
 @Component({
   selector: 'app-events-list',
@@ -27,17 +30,17 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
           <div class="hero-right">
             <div class="status-toggle">
               <button 
-                (click)="selectedStatus.set('all')"
+                [routerLink]="[]" [queryParams]="{ status: 'all' }" queryParamsHandling="merge"
                 class="toggle-btn" 
                 [class.active]="selectedStatus() === 'all'"
               >Tous</button>
               <button 
-                (click)="selectedStatus.set('upcoming')"
+                [routerLink]="[]" [queryParams]="{ status: 'upcoming' }" queryParamsHandling="merge"
                 class="toggle-btn" 
                 [class.active]="selectedStatus() === 'upcoming'"
               >Prochains</button>
               <button 
-                (click)="selectedStatus.set('past')"
+                [routerLink]="[]" [queryParams]="{ status: 'past' }" queryParamsHandling="merge"
                 class="toggle-btn" 
                 [class.active]="selectedStatus() === 'past'"
               >Passés</button>
@@ -49,26 +52,26 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
       <!-- Filter Bar -->
       <nav class="filter-strip">
         <div class="filter-container">
-          <div class="categories">
+          <!-- <div class="categories">
             <span class="filter-label">FILTRER PAR CATÉGORIE :</span>
             <button 
               *ngFor="let cat of categories; trackBy: trackByCategory" 
-              (click)="selectedCategory.set(cat)"
+              [routerLink]="[]" [queryParams]="{ type: cat === 'Tous' ? null : cat }" queryParamsHandling="merge"
               class="category-link"
               [class.active]="selectedCategory() === cat"
             >
               {{ cat }}
             </button>
             <button 
-              (click)="selectedCategory.set('Tous')"
+              [routerLink]="[]" [queryParams]="{ type: null }" queryParamsHandling="merge"
               class="category-link"
               [class.active]="selectedCategory() === 'Tous'"
             >
               Tous
             </button>
-          </div>
+          </div> -->
           <div class="results-count">
-            Affichage de {{ filteredEvents().length }} résultats
+            Affichage de {{ (events$ | async)?.length || 0 }} résultats
           </div>
         </div>
       </nav>
@@ -76,8 +79,8 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
       <!-- Main Grid Content -->
       <main class="events-grid-section">
         <div class="grid-container">
-          <div *ngIf="filteredEvents().length; else loading" class="events-grid">
-            <article *ngFor="let event of filteredEvents(); trackBy: trackByEvent" class="event-card" [class.is-past]="event.status === 'past'">
+          <div *ngIf="events$ | async as events; else loading" class="events-grid">
+            <article *ngFor="let event of events; trackBy: trackByEvent" class="event-card" [class.is-past]="event.status === 'past'" [routerLink]="['/events', event.slug]" style="cursor: pointer;">
               <div class="card-visual">
                 <img [src]="event.coverImage?.url || 'assets/images/placeholder.jpg'" [alt]="event.title" class="event-img" loading="lazy" decoding="async">
                 <div class="date-badge">
@@ -158,28 +161,33 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
 export class EventsListComponent implements OnInit {
   private state = inject(GlobalStateService);
   private seoService = inject(SeoService);
+  private contentService = inject(IContentService);
+  private route = inject(ActivatedRoute);
 
   selectedStatus = signal<'all' | 'upcoming' | 'past'>('all');
   selectedCategory = signal<string>('Tous');
   
   categories = ['Keynotes', 'Ateliers', 'Colloques', 'Séminaires'];
-
-  filteredEvents = computed(() => {
-    let events = this.state.events();
-    
-    if (this.selectedStatus() !== 'all') {
-      events = events.filter(e => e.status === this.selectedStatus());
-    }
-    
-    if (this.selectedCategory() !== 'Tous') {
-      events = events.filter(e => e.type === this.selectedCategory());
-    }
-    
-    return events;
-  });
+  
+  events$!: Observable<Event[]>;
 
   ngOnInit(): void {
     this.seoService.updateTitle('Événements');
+
+    this.route.queryParams.subscribe(params => {
+      this.selectedStatus.set(params['status'] || 'all');
+      this.selectedCategory.set(params['type'] || 'Tous');
+    });
+
+    this.events$ = this.route.queryParams.pipe(
+      switchMap(params => {
+        const filters: any = {};
+        if (params['status'] && params['status'] !== 'all') filters.status = params['status'];
+        if (params['type'] && params['type'] !== 'Tous') filters.type = params['type'];
+        
+        return this.contentService.getEvents(filters);
+      })
+    );
   }
 
   trackByEvent(_: number, event: any) { return event.id; }
