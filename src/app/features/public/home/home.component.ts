@@ -52,8 +52,8 @@ export class HomeComponent implements OnInit {
     const s = this.settings();
     this.seoService.updateTitle('Accueil');
     this.seoService.updateMeta(
-      s?.siteDescription || 'Plateforme éditoriale du Dr. Christian Mamilo. Communication digitale et perspectives académiques.',
-      s?.keywords || ['communication', 'digital', 'académique', 'expertise']
+      s?.site_description || 'Plateforme éditoriale du Dr. Christian Mamilo. Communication digitale et perspectives académiques.',
+      ['communication', 'digital', 'académique', 'expertise', 'mamilo']
     );
   }
 }

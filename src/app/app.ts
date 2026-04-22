@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './layout/header.component';
 import { FooterComponent } from './layout/footer.component';
@@ -42,13 +42,16 @@ export class AppComponent implements OnInit {
   private authService = inject(AuthService);
   private contentStore = inject(ContentStore);
   private state = inject(GlobalStateService);
+  private platformId = inject(PLATFORM_ID);
 
   isAdmin = false;
   isSidebarCollapsed = this.state.sidebarCollapsed;
 
   ngOnInit() {
     // Initial data load
-    this.contentStore.loadAllInitialData();
+    if (isPlatformBrowser(this.platformId)) {
+      this.contentStore.loadAllInitialData();
+    }
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)

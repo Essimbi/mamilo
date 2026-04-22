@@ -59,6 +59,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/admin/event-manager/event-manager.component').then(m => m.EventManagerComponent)
             },
             {
+                path: 'categories',
+                loadComponent: () => import('./features/admin/category-manager/category-manager.component').then(m => m.CategoryManagerComponent)
+            },
+            {
+                path: 'tags',
+                loadComponent: () => import('./features/admin/tag-manager/tag-manager.component').then(m => m.TagManagerComponent)
+            },
+            {
                 path: 'settings',
                 loadComponent: () => import('./features/admin/settings/settings.component').then(m => m.SettingsComponent)
             },

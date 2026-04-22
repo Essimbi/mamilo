@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
           <div class="logo-box">
              <lucide-icon name="book-open" size="18"></lucide-icon>
           </div>
-          <span class="logo-text">{{ s()?.siteName || 'Mamilo Insights' }}</span>
+          <span class="logo-text">{{ s()?.site_name || 'Mamilo Insights' }}</span>
         </a>
 
         <!-- Desktop Nav -->
@@ -77,7 +77,7 @@ import { FormsModule } from '@angular/forms';
              <div class="logo-box">
                 <lucide-icon name="book-open" size="16"></lucide-icon>
              </div>
-             <span>{{ s()?.siteName || 'Mamilo Insights' }}</span>
+             <span>{{ s()?.site_name || 'Mamilo Insights' }}</span>
            </a>
            <button class="close-btn" (click)="isMenuOpen = false">
               <lucide-icon name="x" size="24"></lucide-icon>

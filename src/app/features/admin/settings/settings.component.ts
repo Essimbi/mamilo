@@ -1,265 +1,322 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { GlobalStateService } from '../../../core/services/global-state.service';
 import { ContentStore } from '../../../core/services/content-store.service';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MOCK_USER } from '../../../mock-data/data/users.mock';
+import { MediaPickerComponent } from '../../../shared/components/media-picker.component';
+import { MediaAsset } from '../../../core/models/user.model';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, LucideAngularModule, FormsModule, ReactiveFormsModule, MediaPickerComponent, SkeletonLoaderComponent],
   template: `
     <div class="admin-page">
       <header class="page-header">
         <div class="header-content">
-          <h1>Paramètres & Profil</h1>
-          <p>Gérez votre identité numérique et les configurations globales de la plateforme.</p>
+          <h1>{{ activeTab() === 'profile' ? 'Mon Profil' : 'Paramètres du Site' }}</h1>
+          <p>{{ activeTab() === 'profile' ? 'Gérez vos informations personnelles et votre identité.' : 'Configurez les paramètres globaux de la plateforme.' }}</p>
         </div>
       </header>
 
-      <div class="settings-grid">
-        <!-- Profile Section -->
-        <div class="settings-card card">
+      <div class="tabs-nav">
+        <button class="tab-item" [class.active]="activeTab() === 'profile'" (click)="activeTab.set('profile')">
+          <lucide-icon name="user" size="18"></lucide-icon>
+          <span>Profil</span>
+        </button>
+        <button class="tab-item" [class.active]="activeTab() === 'settings'" (click)="activeTab.set('settings')">
+          <lucide-icon name="settings" size="18"></lucide-icon>
+          <span>Paramètres Site</span>
+        </button>
+      </div>
+
+      <div class="settings-container">
+        <!-- Section Profil -->
+        <div class="settings-card" *ngIf="activeTab() === 'profile'">
           <div class="card-header">
-            <lucide-icon name="user" size="20"></lucide-icon>
-            <h2>Profil de l'Auteur</h2>
+            <h3>Informations de base</h3>
+            <p>Ces informations seront visibles sur vos articles et votre page à propos.</p>
           </div>
           
-          <form [formGroup]="profileForm" class="settings-form">
-            <div class="profile-header">
-              <div class="avatar-upload">
-                <img [src]="u()?.avatar?.url" alt="Avatar" *ngIf="u()">
-                <button type="button" class="btn-avatar-edit">
-                  <lucide-icon name="camera" size="14"></lucide-icon>
+          <div class="form-body" *ngIf="isLoading() && !u()">
+            <app-skeleton type="form" [count]="1"></app-skeleton>
+          </div>
+          
+          <form *ngIf="!isLoading() || u()" [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="form-body">
+            <div class="avatar-section">
+              <div class="avatar-box" (click)="isMediaPickerOpen.set(true)">
+                <img [src]="u()?.avatar?.url || '/hero-mamilo.png'" alt="Avatar">
+                <div class="avatar-overlay">
+                  <lucide-icon name="plus" size="20"></lucide-icon>
+                </div>
+              </div>
+              <div class="avatar-info">
+                <h4>Avatar du profil</h4>
+                <p>Sélectionnez une image de la médiathèque ou téléversez-en une.</p>
+                <button type="button" class="btn-picker-small" (click)="isMediaPickerOpen.set(true)">
+                   Choisir une image
                 </button>
-              </div>
-              <div class="profile-intro">
-                <h3>{{ profileForm.get('name')?.value }}</h3>
-                <p>Administrateur Principal</p>
+                <input type="hidden" formControlName="avatar_id">
+                <span class="error-msg" *ngIf="profileErrors()?.avatar_id">{{ profileErrors().avatar_id[0] }}</span>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Nom Complet</label>
-              <input type="text" formControlName="name">
-            </div>
-
-            <div class="form-group">
-              <label>Email Professionnel</label>
-              <input type="email" formControlName="email">
-            </div>
-
-            <div class="form-group">
-              <label>Biographie</label>
-              <textarea formControlName="bio" rows="4"></textarea>
-            </div>
-
-            <div class="form-section">
-              <h4>Réseaux Sociaux</h4>
+            <div class="form-grid">
               <div class="form-group">
-                <label>LinkedIn</label>
-                <div class="input-with-icon">
-                  <lucide-icon name="linkedin" size="16"></lucide-icon>
-                  <input type="text" formControlName="linkedin">
-                </div>
+                <label>Nom Complet</label>
+                <input type="text" formControlName="name" placeholder="Ex: Christian Mamilo">
+                <span class="error-msg" *ngIf="profileErrors()?.name">{{ profileErrors().name[0] }}</span>
               </div>
+
               <div class="form-group">
-                <label>ResearchGate</label>
-                <div class="input-with-icon">
-                  <lucide-icon name="globe" size="16"></lucide-icon>
-                  <input type="text" formControlName="researchgate">
-                </div>
+                <label>Email (Lecture seule)</label>
+                <input type="email" [value]="u()?.email" readonly class="readonly-field">
+              </div>
+
+              <div class="form-group full-width">
+                <label>Biographie</label>
+                <textarea formControlName="bio" rows="5" placeholder="Décrivez votre expertise..."></textarea>
+                <span class="error-msg" *ngIf="profileErrors()?.bio">{{ profileErrors().bio[0] }}</span>
               </div>
             </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn-primary">Enregistrer les modifications</button>
+            <div class="form-footer">
+              <button type="submit" class="btn-save" [disabled]="profileForm.invalid || profileForm.pristine">
+                Enregistrer le profil
+              </button>
             </div>
           </form>
         </div>
 
-        <!-- Site Settings -->
-        <div class="settings-card card">
+        <!-- Section Paramètres Site -->
+        <div class="settings-card" *ngIf="activeTab() === 'settings'">
           <div class="card-header">
-            <lucide-icon name="settings" size="20"></lucide-icon>
-            <h2>Configuration du Site</h2>
+            <h3>Configuration Plateforme</h3>
+            <p>Paramètres globaux pour l'identité visuelle et le SEO du site.</p>
           </div>
 
-          <form [formGroup]="settingsForm" (ngSubmit)="onUpdateSite()" class="settings-form">
-            <div class="form-group">
-              <label>Nom du Site</label>
-              <input type="text" formControlName="siteName">
-            </div>
+          <div class="form-body" *ngIf="isLoading() && !s()">
+            <app-skeleton type="form" [count]="1"></app-skeleton>
+          </div>
 
-            <div class="form-group">
-              <label>Description SEO (Meta)</label>
-              <textarea rows="3" formControlName="siteDescription"></textarea>
-            </div>
+          <form *ngIf="!isLoading() || s()" [formGroup]="settingsForm" (ngSubmit)="onUpdateSettings()" class="form-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nom du Site</label>
+                <input type="text" formControlName="site_name">
+                <span class="error-msg" *ngIf="siteErrors()?.site_name">{{ siteErrors().site_name[0] }}</span>
+              </div>
 
-            <div class="form-group">
-              <label>Mots-clés par défaut (séparez par virgule)</label>
-              <input type="text" formControlName="keywords">
-            </div>
+              <div class="form-group">
+                <label>Email de Contact</label>
+                <input type="email" formControlName="contact_email">
+                <span class="error-msg" *ngIf="siteErrors()?.contact_email">{{ siteErrors().contact_email[0] }}</span>
+              </div>
 
-            <div class="form-section">
-              <h4>Notifications</h4>
-              <div class="toggle-group">
-                <div class="toggle-item">
-                  <span>Nouveaux commentaires</span>
-                  <input type="checkbox" formControlName="comments">
-                </div>
-                <div class="toggle-item">
-                  <span>Inscriptions Newsletter</span>
-                  <input type="checkbox" formControlName="newsletter">
-                </div>
+              <div class="form-group full-width">
+                <label>Description SEO (Meta)</label>
+                <textarea formControlName="site_description" rows="3"></textarea>
+                <span class="error-msg" *ngIf="siteErrors()?.site_description">{{ siteErrors().site_description[0] }}</span>
+              </div>
+
+              <div class="form-group full-width">
+                <label>Réseaux Sociaux (URLs séparées par virgule)</label>
+                <textarea formControlName="social_media" rows="2" placeholder="https://linkedin.com/in/..., https://twitter.com/..."></textarea>
+                <span class="error-msg" *ngIf="siteErrors()?.social_media">{{ siteErrors().social_media[0] }}</span>
               </div>
             </div>
 
-             <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="settingsForm.invalid">Mettre à jour le site</button>
+            <div class="form-footer">
+              <button type="submit" class="btn-save" [disabled]="settingsForm.invalid || settingsForm.pristine">
+                Sauvegarder les paramètres
+              </button>
             </div>
           </form>
         </div>
       </div>
+
+      <app-media-picker
+        *ngIf="isMediaPickerOpen()"
+        title="Sélectionner votre avatar"
+        (select)="onAvatarSelected($event)"
+        (close)="isMediaPickerOpen.set(false)">
+      </app-media-picker>
     </div>
   `,
   styles: [`
-    @use '../../../styles/abstracts/variables' as *;
-
-    .admin-page { padding: 2rem; }
-    .page-header { margin-bottom: 2rem; h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; } p { color: #64748b; } }
-
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;
-      @media (max-width: 1024px) { grid-template-columns: 1fr; }
+    .admin-page { padding: 2rem; max-width: 1000px; margin: 0 auto; }
+    .page-header { margin-bottom: 2rem; 
+      h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+      p { color: #64748b; font-size: 1.1rem; }
     }
 
-    .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
-    .card-header { padding: 1.25rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 0.75rem;
-      h2 { font-size: 1rem; font-weight: 700; color: #1e293b; }
-      lucide-icon { color: #64748b; }
-    }
-
-    .settings-form { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
-
-    .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 0.5rem;
-      .avatar-upload { position: relative; width: 64px; height: 64px;
-        img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
-        .btn-avatar-edit { position: absolute; bottom: -6px; right: -6px; width: 24px; height: 24px; border-radius: 6px; background: #3b82f6; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .tabs-nav { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0;
+      .tab-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; color: #64748b; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s;
+        &:hover { color: #0f172a; background: #f8fafc; }
+        &.active { color: #3b82f6; border-bottom-color: #3b82f6; }
       }
-      .profile-intro { h3 { font-size: 1.125rem; font-weight: 700; color: #1e293b; } p { font-size: 0.875rem; color: #64748b; } }
+    }
+
+    .settings-card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+    .card-header { padding: 1.5rem 2rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+      h3 { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+      p { color: #64748b; font-size: 0.9rem; margin-top: 0.25rem; }
+    }
+
+    .form-body { padding: 2rem; }
+
+    .avatar-section { display: flex; align-items: center; gap: 2rem; margin-bottom: 2.5rem;
+      .avatar-box { position: relative; width: 100px; height: 100px; border-radius: 20px; overflow: hidden; border: 4px solid #f1f5f9;
+        img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.2s; cursor: pointer; }
+        &:hover .avatar-overlay { opacity: 1; }
+      }
+      .avatar-info {
+        h4 { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; }
+        p { font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem; }
+        .id-input { padding: 0.5rem 0.75rem; font-size: 0.8rem; background: #f1f5f9; border: none; border-radius: 6px; width: 300px; font-family: monospace; }
+      }
+    }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      .full-width { grid-column: span 2; }
     }
 
     .form-group { display: flex; flex-direction: column; gap: 0.5rem;
-      label { font-size: 0.875rem; font-weight: 600; color: #475569; }
-      input, select, textarea { padding: 0.625rem 0.875rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; &:focus { outline: none; border-color: #3b82f6; } }
+      label { font-size: 0.9rem; font-weight: 600; color: #334155; }
+      input, textarea { padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; transition: all 0.2s;
+        &:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        &.readonly-field { background: #f1f5f9; cursor: not-allowed; color: #94a3b8; }
+      }
     }
 
-    .input-with-icon { position: relative;
-      lucide-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-      input { width: 100%; padding-left: 2.25rem; }
+    .form-footer { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; }
+    .btn-save { padding: 0.75rem 2rem; background: #0f172a; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      &:hover:not(:disabled) { background: #334155; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
 
-    .form-section { border-top: 1px solid #f1f5f9; padding-top: 1rem; margin-top: 0.5rem;
-      h4 { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.05em; }
+    .error-msg { color: #ef4444; font-size: 0.8rem; font-weight: 500; }
+
+    .btn-picker-small {
+       margin-top: 0.5rem;
+       padding: 0.5rem 1rem;
+       background: white;
+       border: 1px solid #e2e8f0;
+       border-radius: 8px;
+       font-size: 0.85rem;
+       font-weight: 600;
+       color: #475569;
+       cursor: pointer;
+       transition: all 0.2s;
+       &:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
     }
-
-    .toggle-group { display: flex; flex-direction: column; gap: 1rem; }
-    .toggle-item { display: flex; justify-content: space-between; align-items: center; span { font-size: 0.95rem; color: #1e293b; } }
-
-    .form-actions { margin-top: 0.5rem; }
-    .btn-primary { background: #1e293b; color: white; border: none; padding: 0.75rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: opacity 0.2s; &:hover { opacity: 0.9; } }
   `]
 })
 export class SettingsComponent implements OnInit {
   private state = inject(GlobalStateService);
   private store = inject(ContentStore);
   private fb = inject(FormBuilder);
+  private toast = inject(ToastService);
   
   u = this.state.user;
   s = this.state.settings;
+  isLoading = this.state.isLoading;
+  activeTab = signal<'profile' | 'settings'>('profile');
+  isMediaPickerOpen = signal(false);
 
   profileForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
+    name: ['', [Validators.required, Validators.maxLength(255)]],
     bio: [''],
-    linkedin: [''],
-    twitter: [''],
-    researchgate: ['']
+    avatar_id: ['']
   });
 
   settingsForm: FormGroup = this.fb.group({
-    siteName: ['', [Validators.required]],
-    siteDescription: [''],
-    keywords: [''],
-    comments: [true],
-    newsletter: [true]
+    site_name: ['', [Validators.required, Validators.maxLength(255)]],
+    site_description: ['', [Validators.maxLength(1000)]],
+    contact_email: ['', [Validators.required, Validators.email]],
+    social_media: ['']
   });
 
-  ngOnInit(): void {
-    // Patch Profile
-    const currentUser = this.u();
-    if (currentUser) {
-      this.profileForm.patchValue({
-        name: currentUser.name,
-        email: currentUser.email,
-        bio: currentUser.bio,
-        linkedin: currentUser.social.linkedin,
-        twitter: currentUser.social.twitter,
-        researchgate: currentUser.social.researchgate
-      });
-    }
+  siteErrors = signal<any>(null);
+  profileErrors = signal<any>(null);
 
-    // Patch Settings
-    const settings = this.s();
-    if (settings) {
-      this.patchSettings(settings);
-    }
+  ngOnInit(): void {
+    if (this.u()) this.patchProfile(this.u());
+    if (this.s()) this.patchSettings(this.s());
+  }
+
+  private patchProfile(user: any) {
+    this.profileForm.patchValue({
+      name: user.name,
+      bio: user.bio,
+      avatar_id: user.avatar_id || ''
+    });
   }
 
   private patchSettings(settings: any) {
     this.settingsForm.patchValue({
-      siteName: settings.siteName,
-      siteDescription: settings.siteDescription,
-      keywords: settings.keywords.join(', '),
-      comments: settings.notifications.comments,
-      newsletter: settings.notifications.newsletter
+      site_name: settings.site_name,
+      site_description: settings.site_description,
+      contact_email: settings.contact_email,
+      social_media: (settings.social_media || []).join(', ')
     });
   }
 
-  onSubmit() {
+  onAvatarSelected(asset: MediaAsset) {
+    this.profileForm.patchValue({ avatar_id: asset.id });
+    // Optimistic UI update
+    if (this.u()) {
+      this.state.setUser({ 
+        ...this.u()!, 
+        avatar: asset 
+      } as any);
+    }
+    this.profileForm.markAsDirty();
+  }
+
+  onUpdateProfile() {
     if (this.profileForm.invalid) return;
+    this.profileErrors.set(null);
     
-    const formVal = this.profileForm.value;
-    this.store.updateProfile({
-      name: formVal.name,
-      email: formVal.email,
-      bio: formVal.bio,
-      social: {
-        linkedin: formVal.linkedin,
-        twitter: formVal.twitter,
-        researchgate: formVal.researchgate
+    this.store.updateProfile(this.profileForm.value).subscribe({
+      next: () => this.toast.success('Votre profil a été mis à jour avec succès'),
+      error: (err) => {
+        if (err.status === 422) {
+          this.profileErrors.set(err.error.errors);
+          this.toast.error('Veuillez corriger les erreurs dans le formulaire');
+        } else {
+          this.toast.error('Impossible de mettre à jour le profil');
+        }
       }
-    }).subscribe(() => {
-      alert('Profil mis à jour avec succès');
     });
   }
 
-  onUpdateSite() {
+  onUpdateSettings() {
     if (this.settingsForm.invalid) return;
+    this.siteErrors.set(null);
 
     const val = this.settingsForm.value;
-    this.store.updateSettings({
-      siteName: val.siteName,
-      siteDescription: val.siteDescription,
-      keywords: val.keywords.split(',').map((k: string) => k.trim()),
-      notifications: {
-        comments: val.comments,
-        newsletter: val.newsletter
+    const payload = {
+      site_name: val.site_name,
+      site_description: val.site_description,
+      contact_email: val.contact_email,
+      social_media: val.social_media ? val.social_media.split(',').map((u: string) => u.trim()).filter((u: string) => u !== '') : []
+    };
+
+    this.store.updateSettings(payload).subscribe({
+      next: () => this.toast.success('Les paramètres du site ont été enregistrés avec succès'),
+      error: (err) => {
+        if (err.status === 422) {
+          this.siteErrors.set(err.error.errors);
+          this.toast.error('Veuillez corriger les erreurs de configuration');
+        } else {
+          this.toast.error('Une erreur est survenue lors de la sauvegarde');
+        }
       }
-    }).subscribe(() => {
-      alert('Paramètres du site mis à jour');
     });
   }
 }

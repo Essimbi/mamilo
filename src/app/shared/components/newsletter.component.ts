@@ -1,8 +1,9 @@
-import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScrollRevealDirective } from '../directives/scroll-reveal.directive';
 import { LucideAngularModule } from 'lucide-angular';
+import { IContentService } from '../../core/services/content.interface';
 
 @Component({
   selector: 'app-newsletter',
@@ -32,10 +33,11 @@ import { LucideAngularModule } from 'lucide-angular';
                             placeholder="Entrez votre email académique" 
                             class="newsletter-input" 
                         />
-                        <button type="submit" class="btn-newsletter" [disabled]="!email">
-                            Rejoindre
+                        <button type="submit" class="btn-newsletter" [disabled]="!email || isLoading()">
+                            {{ isLoading() ? 'Envoi...' : 'Rejoindre' }}
                         </button>
                     </form>
+                    <p *ngIf="errorMessage()" class="error-text text-red-500 text-xs mt-2">{{ errorMessage() }}</p>
                     <p class="newsletter-privacy">
                         Nous respectons votre vie privée. Votre adresse ne sera jamais communiquée à des tiers.
                     </p>
@@ -170,14 +172,30 @@ import { LucideAngularModule } from 'lucide-angular';
   `]
 })
 export class NewsletterComponent {
+  private contentService = inject(IContentService);
+  
   email = '';
   submitted = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
 
   onSubmit() {
-    if (this.email) {
-      console.log('Newsletter subscription:', this.email);
-      this.submitted.set(true);
-      this.email = '';
+    if (this.email && !this.isLoading()) {
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+      
+      this.contentService.subscribeNewsletter(this.email).subscribe({
+        next: () => {
+          this.submitted.set(true);
+          this.email = '';
+          this.isLoading.set(false);
+        },
+        error: (err: any) => {
+          console.error('Newsletter error:', err);
+          this.errorMessage.set(err.error?.message || "Une erreur est survenue lors de l'inscription.");
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 }

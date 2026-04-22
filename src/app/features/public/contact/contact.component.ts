@@ -5,6 +5,8 @@ import { SeoService } from '../../../core/services/seo.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ScrollRevealDirective } from '../../../shared/directives/scroll-reveal.directive';
 import { NewsletterComponent } from '../../../shared/components/newsletter.component';
+import { IContentService } from '../../../core/services/content.interface';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
     selector: 'app-contact',
@@ -58,9 +60,9 @@ import { NewsletterComponent } from '../../../shared/components/newsletter.compo
                     <textarea formControlName="message" placeholder="Description détaillée de votre demande..." [class.error]="isFieldInvalid('message')"></textarea>
                   </div>
                   
-                  <button type="submit" class="btn-submit" [disabled]="contactForm.invalid">
-                    Soumettre
-                    <lucide-icon name="arrow-right" size="18"></lucide-icon>
+                  <button type="submit" class="btn-submit" [disabled]="contactForm.invalid || isLoading()">
+                    {{ isLoading() ? 'Envoi en cours...' : 'Soumettre' }}
+                    <lucide-icon *ngIf="!isLoading()" name="arrow-right" size="18"></lucide-icon>
                   </button>
                 </form>
               </ng-container>
@@ -173,9 +175,12 @@ import { NewsletterComponent } from '../../../shared/components/newsletter.compo
 export class ContactComponent implements OnInit {
     private seoService = inject(SeoService);
     private fb = inject(FormBuilder);
+    private contentService = inject(IContentService);
+    private toastService = inject(ToastService);
     
     contactForm!: FormGroup;
     submitted = signal(false);
+    isLoading = signal(false);
 
     ngOnInit(): void {
         this.seoService.updateTitle('Contact & Collaboration');
@@ -197,9 +202,20 @@ export class ContactComponent implements OnInit {
     }
 
     onSubmit(): void {
-        if (this.contactForm.valid) {
-            console.log('Form Submitted', this.contactForm.value);
-            this.submitted.set(true);
+        if (this.contactForm.valid && !this.isLoading()) {
+            this.isLoading.set(true);
+            this.contentService.sendContactMessage(this.contactForm.value).subscribe({
+                next: () => {
+                    this.submitted.set(true);
+                    this.isLoading.set(false);
+                    this.toastService.success('Votre message a été envoyé avec succès.');
+                },
+                error: (err) => {
+                    console.error('Contact error:', err);
+                    this.toastService.error(err.error?.message || "Une erreur est survenue lors de l'envoi du message.");
+                    this.isLoading.set(false);
+                }
+            });
         }
     }
 

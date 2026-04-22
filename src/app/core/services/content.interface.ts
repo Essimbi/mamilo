@@ -24,9 +24,11 @@ export abstract class IContentService {
     abstract getEvents(status?: 'upcoming' | 'past'): Observable<Event[]>;
     abstract getEventBySlug(slug: string): Observable<Event | null>;
     abstract getCategories(): Observable<Category[]>;
+    abstract getCategoryBySlug(slug: string): Observable<Category | null>;
     abstract getTags(): Observable<Tag[]>;
     abstract searchContent(query: string): Observable<Post[]>;
-    abstract getMedia(): Observable<MediaAsset[]>;
+    abstract getMedia(type?: string, search?: string): Observable<MediaAsset[]>;
+    abstract getMediaById(id: string): Observable<MediaAsset>;
 
     // CRUD operations for Admin
     abstract createPost(post: Partial<Post>): Observable<Post>;
@@ -37,8 +39,19 @@ export abstract class IContentService {
     abstract updateEvent(id: string, event: Partial<Event>): Observable<Event>;
     abstract deleteEvent(id: string): Observable<boolean>;
 
-    abstract uploadMedia(asset: Partial<MediaAsset>): Observable<MediaAsset>;
+    // CRUD operations for Categories
+    abstract createCategory(category: Partial<Category>): Observable<Category>;
+    abstract updateCategory(id: string, category: Partial<Category>): Observable<Category>;
+    abstract deleteCategory(id: string): Observable<boolean>;
+
+    // CRUD operations for Tags
+    abstract createTag(tag: Partial<Tag>): Observable<Tag>;
+    abstract updateTag(id: string, tag: Partial<Tag>): Observable<Tag>;
+    abstract deleteTag(id: string): Observable<boolean>;
+
+    abstract uploadMedia(file: File | any): Observable<MediaAsset>;
     abstract deleteMedia(id: string): Observable<boolean>;
+    abstract updateMedia(id: string, metadata: { alt?: string, description?: string }): Observable<MediaAsset>;
 
     abstract getProfile(): Observable<User>;
     abstract updateProfile(user: Partial<User>): Observable<User>;
@@ -49,5 +62,11 @@ export abstract class IContentService {
     // Social actions
     abstract likePost(id: string): Observable<number>;
     abstract likeEvent(id: string): Observable<number>;
-    abstract addComment(postId: string, comment: any): Observable<any>;
+    abstract addComment(post_id: string, comment: any): Observable<any>;
+    
+    // New Public Actions
+    abstract subscribeNewsletter(email: string): Observable<any>;
+    abstract sendContactMessage(data: { name: string, email: string, subject: string, message: string }): Observable<any>;
+    abstract getRelatedPosts(postId: string): Observable<Post[]>;
+    abstract getPostNavigation(postId: string): Observable<{ previous: Post | null, next: Post | null }>;
 }

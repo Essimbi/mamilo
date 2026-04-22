@@ -318,8 +318,8 @@ export class AboutComponent implements OnInit, AfterViewInit {
     }
     this.seoService.updateTitle('À Propos');
     this.seoService.updateMeta(
-      s?.siteDescription || 'Découvrez le Dr. ' + (this.author()?.name || 'Christian Mamilo'),
-      s?.keywords || ['expert', 'parcours', 'about']
+      s?.site_description || 'Découvrez le Dr. ' + (this.author()?.name || 'Christian Mamilo'),
+      ['expert', 'parcours', 'about', 'mamilo']
     );
   }
 

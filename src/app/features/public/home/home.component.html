@@ -86,12 +86,12 @@
                     </div>
                     <div class="card-body">
                         <div class="card-meta">
-                            <span>
-                                <lucide-icon name="calendar" [size]="13"></lucide-icon>
+                              <span class="date">
+                                <lucide-icon name="calendar" size="14"></lucide-icon>
                                 {{ post.publishedAt | date:'d MMM yyyy' }}
-                            </span>
-                            <span>
-                                <lucide-icon name="clock" [size]="13"></lucide-icon>
+                              </span>
+                              <span class="read-time">
+                                <lucide-icon name="clock" size="14"></lucide-icon>
                                 {{ post.readingTime }} min
                             </span>
                         </div>
@@ -220,13 +220,13 @@
                         <h3 class="engagement-card__title">{{ event.title }}</h3>
                         <div class="engagement-card__meta">
                             <span>
-                                <lucide-icon name="map-pin" [size]="13"></lucide-icon>
-                                {{ event.location.city }}, {{ event.location.country }}
-                            </span>
-                            <span>
-                                <lucide-icon name="calendar" [size]="13"></lucide-icon>
-                                {{ event.startDate | date:'d MMM yyyy' }}
-                            </span>
+                    <lucide-icon name="map-pin" size="14"></lucide-icon>
+                    {{ event.location }}
+                  </span>
+                  <span>
+                    <lucide-icon name="calendar-days" size="14"></lucide-icon>
+                    {{ event.eventDate | date:'d MMM yyyy' }}
+                  </span>
                         </div>
                         <p class="engagement-card__desc">{{ event.description }}</p>
                     </div>

@@ -81,8 +81,8 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
               <div class="card-visual">
                 <img [src]="event.coverImage?.url || 'assets/images/placeholder.jpg'" [alt]="event.title" class="event-img" loading="lazy" decoding="async">
                 <div class="date-badge">
-                  <span class="month">{{ event.startDate | date:'MMM' }}</span>
-                  <span class="day">{{ event.startDate | date:'dd' }}</span>
+                  <span class="month">{{ event.eventDate | date:'MMM' }}</span>
+                  <span class="day">{{ event.eventDate | date:'dd' }}</span>
                 </div>
                 <div class="status-badge" [class.upcoming]="event.status === 'upcoming'" [class.past]="event.status === 'past'">
                   {{ event.status === 'upcoming' ? 'Prochain' : 'Passé' }}
@@ -96,15 +96,15 @@ import { LucideAngularModule, Calendar, MapPin, Clock, Heart, ArrowRight, Chevro
                 <div class="event-info-list">
                   <div class="info-item">
                     <lucide-icon name="calendar" size="14"></lucide-icon>
-                    <span>{{ event.startDate | date:'MMM dd, yyyy' | uppercase }}</span>
+                    <span>{{ event.eventDate | date:'MMM dd, yyyy' | uppercase }}</span>
                   </div>
                   <div class="info-item">
                     <lucide-icon name="map-pin" size="14"></lucide-icon>
-                    <span>{{ event.location.venue }}, {{ event.location.city }}</span>
+                    <span>{{ event.location }}</span>
                   </div>
                   <div class="info-item">
                     <lucide-icon name="clock" size="14"></lucide-icon>
-                    <span>{{ event.startDate | date:'HH:mm' }} — {{ event.endDate | date:'HH:mm' }} GMT</span>
+                    <span>{{ event.eventDate | date:'HH:mm' }} GMT</span>
                   </div>
                   <div class="info-item" *ngIf="event.likesCount">
                     <lucide-icon name="heart" size="14"></lucide-icon>

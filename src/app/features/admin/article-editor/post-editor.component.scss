@@ -131,109 +131,301 @@
     }
 }
 
-.tiptap-wrapper {
-    padding: 0;
-    overflow: hidden;
+// ─── Server Error Banner ───────────────────────────────────────
+.server-error-banner {
     display: flex;
-    flex-direction: column;
-    min-height: 600px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    border: 1px solid #fecdd3;
+    border-radius: 0.75rem;
+    color: #be123c;
+    font-size: 0.875rem;
+    font-weight: 600;
+    animation: slideDown 0.3s ease-out;
+
+    lucide-icon {
+        flex-shrink: 0;
+        opacity: 0.8;
+    }
 }
 
-.tiptap-toolbar {
-    padding: 0.75rem;
+// ─── Block Editor ──────────────────────────────────────────────
+.block-editor {
+    padding: 0;
+    overflow: hidden;
+
+    .block-editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        background: linear-gradient(135deg, $slate-50, lighten($slate-50, 2%));
+        border-bottom: 1px solid $slate-100;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+
+        h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: $navy;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+    }
+
+    .block-toolbar {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-add-block {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-radius: 0.5rem;
+        border: 1px solid $slate-200;
+        background: white;
+        color: $slate-600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        lucide-icon {
+            opacity: 0.7;
+        }
+
+        &:hover {
+            background: $navy;
+            color: white;
+            border-color: $navy;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba($navy, 0.15);
+
+            lucide-icon {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+.blocks-list {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.block-item {
+    background: white;
+    border: 1px solid $slate-100;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    animation: blockAppear 0.35s ease-out;
+
+    &:hover {
+        border-color: $slate-200;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+}
+
+.block-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
     background: $slate-50;
     border-bottom: 1px solid $slate-100;
-    display: flex;
-    gap: 0.25rem;
-    flex-wrap: wrap;
 
-    .btn-tool {
-        width: 34px;
-        height: 34px;
+    .block-number {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: white;
+        background: $navy;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 0.35rem;
-        border: none;
-        background: transparent;
-        color: $slate-600;
-        cursor: pointer;
-        font-weight: 700;
-        transition: all 0.2s;
-
-        &:hover {
-            background: $slate-200;
-        }
-
-        &.active {
-            background: $navy;
-            color: white;
-        }
-
-        span {
-            font-size: 0.85rem;
-        }
+        flex-shrink: 0;
     }
 
-    .tool-divider {
-        width: 1px;
-        height: 20px;
-        background: $slate-200;
-        margin: auto 0.5rem;
+    .block-type {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        background: linear-gradient(135deg, lighten($medium-blue, 38%), lighten($medium-blue, 42%));
+        color: $medium-blue;
+    }
+
+    .block-actions {
+        display: flex;
+        gap: 0.25rem;
+        margin-left: auto;
+
+        button {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid $slate-100;
+            background: white;
+            color: $slate-400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover:not(:disabled) {
+                background: $slate-100;
+                color: $navy;
+                border-color: $slate-200;
+            }
+
+            &:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            &.btn-delete-block {
+                &:hover:not(:disabled) {
+                    background: #fff1f2;
+                    border-color: #fecdd3;
+                    color: #e11d48;
+                }
+            }
+        }
     }
 }
 
-.editor-content {
-    flex: 1;
-    padding: 2.5rem;
-    font-family: $font-serif;
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: $slate-800;
-    height: 100%;
+.block-body {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
 
-    ::ng-deep .ProseMirror {
-        min-height: 500px;
-        outline: none !important;
+.block-input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.6rem;
+    border: 1px solid $slate-100;
+    background: $slate-50;
+    font-size: 0.92rem;
+    color: $navy;
+    font-family: $font-sans;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: vertical;
 
-        p {
-            margin-bottom: 1.5rem;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin: 2rem 0 1rem;
-            color: $navy;
-        }
-
-        h3 {
-            font-size: 1.5rem;
-            margin: 1.5rem 0 1rem;
-            color: $navy;
-        }
-
-        blockquote {
-            border-left: 4px solid $medium-blue;
-            padding-left: 1.5rem;
-            font-style: italic;
-            color: $slate-500;
-            margin: 2rem 0;
-        }
-
-        ul,
-        ol {
-            margin-bottom: 1.5rem;
-            padding-left: 1.5rem;
-        }
-
-        p.is-editor-empty:first-child::before {
-            content: attr(data-placeholder);
-            float: left;
-            color: $slate-300;
-            pointer-events: none;
-            height: 0;
-        }
+    &::placeholder {
+        color: $slate-300;
     }
+
+    &:focus {
+        border-color: $medium-blue;
+        background: white;
+        box-shadow: 0 0 0 3px rgba($medium-blue, 0.08);
+    }
+
+    &.small {
+        max-width: 200px;
+    }
+
+    &.quote-text {
+        font-style: italic;
+        border-left: 3px solid $medium-blue;
+        border-radius: 0 0.6rem 0.6rem 0;
+    }
+}
+
+.empty-blocks {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: $slate-400;
+    font-size: 0.9rem;
+
+    p {
+        margin: 0;
+    }
+}
+
+// ─── SEO Section ───────────────────────────────────────────────
+.seo-section {
+    h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: $navy;
+        margin: 0 0 1.25rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid $slate-100;
+    }
+
+    .field-group + .field-group {
+        margin-top: 1rem;
+    }
+}
+
+// ─── Error Message ─────────────────────────────────────────────
+.error-msg {
+    font-size: 0.75rem;
+    color: #e11d48;
+    font-weight: 600;
+    padding-left: 0.25rem;
+}
+
+.loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+// ─── Animations ────────────────────────────────────────────────
+@keyframes blockAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .editor-sidebar {
@@ -415,5 +607,150 @@
                 color: $medium-blue;
             }
         }
+    }
+}
+
+// ─── Media Picker Integration ──────────────────────────────────
+.cover-picker-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .cover-preview {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid $slate-200;
+        background: $slate-50;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-remove-cover {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 28px;
+            height: 28px;
+            background: rgba(white, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid $slate-200;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $slate-600;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+
+            &:hover {
+                background: white;
+                color: #e11d48;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .btn-picker-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.85rem;
+        background: white;
+        border: 2px dashed $slate-200;
+        border-radius: 1rem;
+        color: $slate-600;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $medium-blue;
+            background: $slate-50;
+            color: $medium-blue;
+        }
+
+        lucide-icon {
+            opacity: 0.7;
+        }
+    }
+}
+
+.image-picker-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+
+    .image-preview-mini {
+        width: 80px;
+        height: 80px;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: 1px solid $slate-200;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .image-picker-actions {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .btn-outline-sm {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.85rem;
+            background: white;
+            border: 1px solid $slate-200;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $slate-600;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background: $slate-50;
+                border-color: $slate-300;
+                color: $navy;
+            }
+        }
+    }
+}
+
+.btn-outline-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid $slate-200;
+    background: white;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $slate-600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: $slate-50;
+        border-color: $slate-300;
+        color: $navy;
     }
 }

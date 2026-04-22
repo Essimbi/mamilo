@@ -6,11 +6,13 @@ import { GlobalStateService } from '../../../core/services/global-state.service'
 import { ContentStore } from '../../../core/services/content-store.service';
 import { Post } from '../../../core/models/post.model';
 import { FormsModule } from '@angular/forms';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-article-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule, SkeletonLoaderComponent],
   template: `
     <div class="admin-page">
       <header class="page-header">
@@ -26,27 +28,27 @@ import { FormsModule } from '@angular/forms';
         </div>
       </header>
 
+      <!-- Skeleton loader -->
+      <app-skeleton *ngIf="isLoading() && allPosts().length === 0" type="table" [count]="6"></app-skeleton>
+
+      <ng-container *ngIf="!isLoading() || allPosts().length > 0">
       <div class="filters-bar card">
         <div class="search-box">
           <lucide-icon name="search" size="18"></lucide-icon>
           <input 
             type="text" 
-            [(ngModel)]="searchQuery" 
+            [value]="searchQuery()"
             placeholder="Rechercher un article..."
-            (input)="onSearch()"
+            (input)="onSearch($event)"
           >
         </div>
         <div class="filters-actions">
-          <select [(ngModel)]="statusFilter" (change)="onFilterChange()" class="select-input">
+          <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" class="select-input">
             <option value="all">Tous les statuts</option>
             <option value="published">Publiés</option>
             <option value="draft">Brouillons</option>
-          </select>
-          <select [(ngModel)]="typeFilter" (change)="onFilterChange()" class="select-input">
-            <option value="all">Tous les types</option>
-            <option value="article">Articles</option>
-            <option value="note">Notes</option>
-            <option value="recap">Recaps</option>
+            <option value="scheduled">Planifiés</option>
+            <option value="archived">Archivés</option>
           </select>
         </div>
       </div>
@@ -56,6 +58,7 @@ import { FormsModule } from '@angular/forms';
           <thead>
             <tr>
               <th>Article</th>
+              <!-- <th>Type</th> -->
               <th>Statut</th>
               <th>Catégorie</th>
               <th>Date</th>
@@ -70,13 +73,24 @@ import { FormsModule } from '@angular/forms';
                   <span class="article-slug">{{ post.slug }}</span>
                 </div>
               </td>
+              <!-- <td>
+                <span class="type-badge" [class]="post.type">
+                  {{ post.type === 'article' ? 'Article' : post.type === 'note' ? 'Note' : 'Récap' }}
+                </span>
+              </td> -->
               <td>
                 <span class="status-badge" [class]="post.status">
-                  {{ post.status === 'published' ? 'Publié' : 'Brouillon' }}
+                  {{ post.status === 'published' ? 'Publié' : post.status === 'draft' ? 'Brouillon' : post.status === 'scheduled' ? 'Planifié' : 'Archivé' }}
                 </span>
               </td>
-              <td>{{ post.category.name }}</td>
-              <td>{{ (post.publishedAt || post.createdAt) | date:'d MMM yyyy' }}</td>
+              <td>{{ getCategoryNames(post) }}</td>
+              <td>{{ post.publishedAt | date:'d MMM yyyy' }}</td>
+              <td>{{ post.readingTime }}m</td>
+              <td>
+                <div class="metrics">
+                  <span title="J'aime"><lucide-icon name="heart" size="14"></lucide-icon> {{ post.likesCount }}</span>
+                </div>
+              </td>
               <td class="text-right">
                 <div class="actions-group">
                   <a [routerLink]="['/admin/posts/edit', post.slug]" class="btn-icon" title="Modifier">
@@ -89,7 +103,7 @@ import { FormsModule } from '@angular/forms';
               </td>
             </tr>
             <tr *ngIf="filteredPosts().length === 0">
-              <td colspan="5" class="empty-state">
+              <td colspan="7" class="empty-state">
                 <lucide-icon name="file-text" size="48"></lucide-icon>
                 <p>Aucun article ne correspond à votre recherche.</p>
               </td>
@@ -97,6 +111,7 @@ import { FormsModule } from '@angular/forms';
           </tbody>
         </table>
       </div>
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -239,6 +254,31 @@ import { FormsModule } from '@angular/forms';
       }
     }
 
+    .type-badge {
+      display: inline-flex;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+
+      &.article {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      &.note {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      &.recap {
+        background: #ede9fe;
+        color: #6d28d9;
+      }
+    }
+
     .status-badge {
       display: inline-flex;
       padding: 0.25rem 0.625rem;
@@ -254,6 +294,16 @@ import { FormsModule } from '@angular/forms';
       &.draft {
         background: #f1f5f9;
         color: #475569;
+      }
+
+      &.scheduled {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      &.archived {
+        background: #fee2e2;
+        color: #991b1b;
       }
     }
 
@@ -306,33 +356,32 @@ import { FormsModule } from '@angular/forms';
 export class ArticleListComponent implements OnInit {
   private state = inject(GlobalStateService);
   private store = inject(ContentStore);
+  private toast = inject(ToastService);
 
-  searchQuery = '';
-  statusFilter = 'all';
-  typeFilter = 'all';
+  isLoading = this.state.isLoading;
+
+  searchQuery = signal('');
+  statusFilter = signal('all');
 
   allPosts = this.state.posts;
 
   filteredPosts = computed(() => {
-    return this.allPosts().filter(post => {
-      const matchesSearch = post.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                          post.slug.toLowerCase().includes(this.searchQuery.toLowerCase());
-      
-      const matchesStatus = this.statusFilter === 'all' || post.status === this.statusFilter;
-      const matchesType = this.typeFilter === 'all' || post.type === this.typeFilter;
+    const query = this.searchQuery().toLowerCase();
+    const status = this.statusFilter();
 
-      return matchesSearch && matchesStatus && matchesType;
+    return this.allPosts().filter(post => {
+      const matchesSearch = !query ||
+        post.title.toLowerCase().includes(query) ||
+        post.slug.toLowerCase().includes(query);
+      const matchesStatus = status === 'all' || post.status === status;
+      return matchesSearch && matchesStatus;
     });
   });
 
   ngOnInit(): void {}
 
-  onSearch() {
-    // Computed signal handles this reactively
-  }
-
-  onFilterChange() {
-    // Computed signal handles this reactively
+  onSearch(event: any) {
+    this.searchQuery.set(event.target.value);
   }
 
   onDelete(post: Post) {
@@ -340,11 +389,21 @@ export class ArticleListComponent implements OnInit {
       this.store.deletePost(post.id).subscribe({
         next: (success) => {
           if (success) {
-            console.log('Post deleted');
+            this.toast.success(`Article "${post.title}" supprimé avec succès`);
           }
         },
-        error: (err) => console.error('Delete failed', err)
+        error: (err) => {
+          this.toast.error('Erreur lors de la suppression de l\'article');
+          console.error('Delete failed', err);
+        }
       });
     }
+  }
+
+  getCategoryNames(post: Post): string {
+    if (post.categories && post.categories.length > 0) {
+      return post.categories.map(c => c.name).join(', ');
+    }
+    return post.category?.name || 'Non classé';
   }
 }

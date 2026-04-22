@@ -8,6 +8,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Observable, switchMap, tap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ContentStore } from '../../../core/services/content-store.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-article-detail',
@@ -16,7 +17,7 @@ import { ContentStore } from '../../../core/services/content-store.service';
   imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule],
   styleUrl: './article-detail.component.scss',
   template: `
-    <article *ngIf="post$ | async as post" class="article-container">
+    <article *ngIf="post() as post" class="article-container">
       <!-- Reading Progress Bar -->
       <div class="reading-progress">
         <div class="progress-bar" [style.width.%]="readingProgress()"></div>
@@ -31,9 +32,9 @@ import { ContentStore } from '../../../core/services/content-store.service';
           <button class="social-icon" (click)="share('twitter', post)" title="Partager sur Twitter">
             <lucide-icon name="twitter" size="18"></lucide-icon>
           </button>
-          <button class="social-icon" (click)="onLike(post.id)" [class.liked]="hasLiked()" title="J'aime">
-            <lucide-icon name="heart" [class.fill]="hasLiked()" size="18"></lucide-icon>
-            <span class="count" *ngIf="post.likesCount">{{ post.likesCount }}</span>
+          <button class="action-btn" [class.active]="hasLiked()" (click)="onLike(post.id)" title="J'aime">
+            <lucide-icon name="heart" [size]="20" [class.filled]="hasLiked()"></lucide-icon>
+            <span>{{ post.likesCount }}</span>
           </button>
           <div class="divider"></div>
           <button class="social-icon bookmark" title="Sauvegarder">
@@ -42,8 +43,18 @@ import { ContentStore } from '../../../core/services/content-store.service';
         </div>
       </aside>
 
-      <!-- Article Hero Section -->
-      <section class="article-hero">
+      <!-- Full Bleed Hero Header -->
+      <header class="hero-banner">
+        <div class="hero-image-wrapper" *ngIf="post.coverImage">
+          <img 
+            [src]="post.coverImage.url" 
+            [alt]="post.coverImage.alt || post.title"
+            class="hero-image"
+            loading="eager" decoding="async" fetchpriority="high"
+          >
+          <div class="hero-overlay"></div>
+        </div>
+
         <div class="hero-content">
           <div class="breadcrumb">
             <a routerLink="/articles"><lucide-icon name="chevron-left" size="16"></lucide-icon> Retour aux articles</a>
@@ -57,64 +68,52 @@ import { ContentStore } from '../../../core/services/content-store.service';
           <p class="article-subtitle">{{ post.excerpt }}</p>
 
           <div class="author-meta">
-            <img [src]="post.author.avatar.url" class="author-avatar" [alt]="post.author.name" loading="eager" decoding="async" fetchpriority="high">
+            <img [src]="post.author.avatar?.url || 'assets/images/default-avatar.png'" class="author-avatar" [alt]="post.author.name" loading="eager" decoding="async" fetchpriority="high">
             <div class="meta-info">
               <span class="author-name">Par {{ post.author.name }}</span>
               <div class="sub-meta">
-                <span class="publish-date"><lucide-icon name="calendar" size="14"></lucide-icon> {{ post.publishedAt | date:'mediumDate' }}</span>
-                <span class="reading-time"><lucide-icon name="clock" size="14"></lucide-icon> {{ post.readingTime }} min</span>
+                <span>{{ post.publishedAt! | date:'d MMMM yyyy' }}</span>
+                <span class="dot">•</span>
+                <span>{{ post.readingTime }} min de lecture</span>
               </div>
             </div>
           </div>
+          <p *ngIf="post.coverImage?.alt" class="hero-image-caption">Crédit image : {{ post.coverImage?.alt }}</p>
         </div>
-      </section>
-
-      <!-- Featured Image -->
-      <div class="featured-image-container">
-        <img 
-          *ngIf="post.coverImage" 
-          [src]="post.coverImage.url" 
-          [alt]="post.coverImage.alt"
-          class="featured-image"
-          loading="lazy" decoding="async"
-        >
-        <p class="image-caption">Image : La pédagogie inversée en université, un levier pour l'engagement étudiant.</p>
-      </div>
+      </header>
 
       <!-- Article Body -->
       <main class="article-main">
-        <div class="article-body" [innerHTML]="post.content"></div>
+        <div class="article-body">
+          <ng-container *ngFor="let block of post.blocks || []">
+            <!-- Text Blocks -->
+            <div class="content-block text-block" *ngIf="block.type === 'paragraph' || block.type === 'heading'">
+              <p *ngIf="block.type === 'paragraph'" [innerHTML]="block.content.text"></p>
+              <h2 *ngIf="block.type === 'heading' && (block.content.level === 2 || !block.content.level)" [innerHTML]="block.content.text"></h2>
+              <h3 *ngIf="block.type === 'heading' && block.content.level === 3" [innerHTML]="block.content.text"></h3>
+              <h4 *ngIf="block.type === 'heading' && block.content.level === 4" [innerHTML]="block.content.text"></h4>
+            </div>
+            
+            <!-- Media Blocks (Images) -->
+            <figure *ngIf="block.type === 'image'" class="content-block media-block">
+              <img [src]="block.content.url" [alt]="block.content.caption || ''" loading="lazy">
+              <figcaption *ngIf="block.content.caption">{{ block.content.caption }}</figcaption>
+            </figure>
 
-        <!-- Blockquote Example (Styled in SCSS) -->
-        <div class="highlight-quote">
-          <p>« Nous assistons à un passage de la République des Lettres à la République des Pixels... où le poids d’un argument est souvent mesuré par ses métadonnées plutôt que par sa logique. »</p>
-          <span class="quote-source">— Pr. MAMELO Christian</span>
-        </div>
-
-        <!-- Data Visualization Mockup -->
-        <div class="data-section">
-          <div class="chart-container">
-            <div class="chart-header">
-              <h3>Impact des algorithmes sur la visibilité académique</h3>
-              <p>Évolution de la visibilité des travaux selon les critères de classement (2020-2024)</p>
+            <!-- Quotes -->
+            <div class="content-block quote-block" *ngIf="block.type === 'quote'">
+              <blockquote class="highlight-quote">
+                <p [innerHTML]="block.content.text"></p>
+                <span *ngIf="block.content.caption" class="quote-source">— {{ block.content.caption }}</span>
+              </blockquote>
             </div>
-            <div class="chart-mockup">
-              <!-- Placeholder for chart image -->
-              <div class="chart-placeholder">
-                <lucide-icon name="trending-up" size="48"></lucide-icon>
-                <span>Visualisation des données</span>
-              </div>
-            </div>
-            <div class="chart-stat">
-              <span class="stat-value">+42%</span>
-              <span class="stat-label">de visibilité pour les articles optimisés SEO académique</span>
-            </div>
-          </div>
+          </ng-container>
         </div>
 
         <!-- Tags Section -->
-        <div class="tags-section">
-          <a *ngFor="let tag of post.tags; trackBy: trackByTag" [routerLink]="['/articles']" [queryParams]="{tag: tag.name}" class="tag-btn">
+        <div *ngIf="(post.tags || []).length > 0" class="tags-section">
+          <lucide-icon name="hash" size="16" class="tags-icon"></lucide-icon>
+          <a *ngFor="let tag of post.tags; trackBy: trackByTag" [routerLink]="['/articles']" [queryParams]="{tag: tag.name}" class="tag-badge">
             {{ tag.name }}
           </a>
         </div>
@@ -122,42 +121,28 @@ import { ContentStore } from '../../../core/services/content-store.service';
         <!-- Author Card -->
         <section class="author-card">
           <div class="author-card-content">
-            <img [src]="post.author.avatar.url" class="author-card-avatar" [alt]="post.author.name">
+            <img [src]="post.author.avatar?.url || 'assets/images/default-avatar.png'" class="author-card-avatar" [alt]="post.author.name">
             <div class="author-card-info">
               <h3 class="author-card-name">{{ post.author.name }}</h3>
-              <p class="author-card-role">PROFESSEUR ÉMÉRITE DE LA COMMUNICATION</p>
-              <p class="author-card-bio">{{ post.author.bio }}</p>
-              <a href="#" class="read-more-link">Lire ses articles <lucide-icon name="chevron-right" size="16"></lucide-icon></a>
+              <p *ngIf="post.author.role" class="author-card-role">{{ post.author.role }}</p>
+              <p *ngIf="post.author.bio" class="author-card-bio">{{ post.author.bio }}</p>
+              <a routerLink="/about" class="read-more-link">Voir le profil <lucide-icon name="chevron-right" size="16"></lucide-icon></a>
             </div>
           </div>
         </section>
 
         <!-- Related Articles -->
-        <section class="related-articles">
+        <section *ngIf="relatedPosts().length > 0" class="related-articles">
           <div class="section-header">
             <h2>Informations connexes</h2>
             <a routerLink="/articles" class="view-all">Découvrir plus d'articles <lucide-icon name="chevron-right" size="16"></lucide-icon></a>
           </div>
           <div class="related-grid">
-            <div class="related-card">
-              <img src="assets/images/mock/article1.jpg" alt="Article 1" class="card-img" loading="lazy" decoding="async">
+            <div *ngFor="let rel of relatedPosts()" class="related-card" [routerLink]="['/articles', rel.slug]">
+              <img [src]="rel.coverImage?.url || 'assets/images/mock/article-placeholder.jpg'" [alt]="rel.title" class="card-img" loading="lazy">
               <div class="card-content">
-                <span class="card-category">Technologie</span>
-                <h4 class="card-title">L'avenir de l'évaluation par les pairs</h4>
-              </div>
-            </div>
-            <div class="related-card">
-              <img src="assets/images/mock/article2.jpg" alt="Article 2" class="card-img" loading="lazy" decoding="async">
-              <div class="card-content">
-                <span class="card-category">Éthique</span>
-                <h4 class="card-title">Protection des données de la recherche</h4>
-              </div>
-            </div>
-            <div class="related-card">
-              <img src="assets/images/mock/article3.jpg" alt="Article 3" class="card-img" loading="lazy" decoding="async">
-              <div class="card-content">
-                <span class="card-category">Gouvernance</span>
-                <h4 class="card-title">Souveraineté académique à l'ère du Big Data</h4>
+                <span class="card-category">{{ rel.category?.name || 'Recherche' }}</span>
+                <h4 class="card-title">{{ rel.title }}</h4>
               </div>
             </div>
           </div>
@@ -165,31 +150,44 @@ import { ContentStore } from '../../../core/services/content-store.service';
 
         <!-- Discussions -->
         <section class="discussion-section">
-          <h2 class="discussion-title"><lucide-icon name="message-square" size="20"></lucide-icon> Discussions ({{ post.comments.length }})</h2>
+          <h2 class="discussion-title"><lucide-icon name="message-square" size="20"></lucide-icon> Discussions ({{ post.comments?.length || 0 }})</h2>
           <div class="comment-input-area">
-            <img [src]="'assets/images/mock/avatar.jpg'" class="current-user-avatar" alt="User">
+            <div class="avatar-placeholder">
+              <lucide-icon name="user" size="20"></lucide-icon>
+            </div>
             <div class="input-wrapper">
-              <textarea [(ngModel)]="newComment" placeholder="Contribuez au discours académique..."></textarea>
+              <textarea [(ngModel)]="newComment" placeholder="Partagez votre avis sur cet article..."></textarea>
               <div class="input-footer">
-                <p class="char-info">Votre message sera soumis à la modération avant publication.</p>
-                <button class="submit-btn" (click)="onSubmitComment(post.id)" [disabled]="!newComment.trim()">Publier un commentaire</button>
+                <p class="char-info">
+                  <lucide-icon name="shield-check" size="14"></lucide-icon>
+                  Soumis à modération avant publication
+                </p>
+                <button class="submit-btn" (click)="onSubmitComment(post.id)" [disabled]="!newComment.trim()">
+                  <lucide-icon name="send" size="16"></lucide-icon>
+                  Publier
+                </button>
               </div>
             </div>
           </div>
           <div class="comments-list">
-             <div *ngFor="let comment of post.comments; trackBy: trackByComment" class="comment-item" appScrollReveal>
-               <img [src]="comment.authorAvatar" class="comment-avatar" [alt]="comment.authorName">
+             <div *ngFor="let comment of post.comments || []; trackBy: trackByComment" class="comment-item">
+               <div class="comment-avatar-wrapper">
+                 <img *ngIf="comment.authorAvatar" [src]="comment.authorAvatar" class="comment-avatar" [alt]="comment.authorName">
+                 <div *ngIf="!comment.authorAvatar" class="avatar-initial">{{ (comment.authorName || 'A').charAt(0) }}</div>
+               </div>
                <div class="comment-content">
                  <div class="comment-header">
                    <h4 class="comment-author">{{ comment.authorName }}</h4>
-                   <span class="comment-date">{{ comment.createdAt | date:'shortDate' }}</span>
+                   <span class="comment-date">{{ comment.createdAt | date:'d MMM yyyy' }}</span>
                  </div>
                  <p class="comment-text">{{ comment.content }}</p>
                </div>
              </div>
 
-             <div *ngIf="!post.comments.length" class="no-comments">
-               Soyez le premier à contribuer à cette discussion académique.
+             <div *ngIf="!(post.comments?.length)" class="no-comments">
+               <lucide-icon name="message-circle" size="32"></lucide-icon>
+               <p>Aucun commentaire pour le moment</p>
+               <span>Soyez le premier à partager votre avis sur cet article.</span>
              </div>
           </div>
         </section>
@@ -203,30 +201,51 @@ export class ArticleDetailComponent implements OnInit {
   private seoService = inject(SeoService);
   private route = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
+  private toastService = inject(ToastService);
 
-  post$!: Observable<Post | null>;
+  post = signal<Post | null>(null);
+  relatedPosts = signal<Post[]>([]);
+  navigation = signal<{ previous: Post | null; next: Post | null }>({ previous: null, next: null });
   readingProgress = signal(0);
   newComment = '';
   hasLiked = signal(false);
   private isBrowser = isPlatformBrowser(this.platformId);
 
   ngOnInit(): void {
-    this.post$ = this.route.params.pipe(
-      switchMap(params => this.contentService.getPostBySlug(params['slug'])),
-      tap(post => {
+    this.route.params.pipe(
+      switchMap(params => this.contentService.getPostBySlug(params['slug']))
+    ).subscribe({
+      next: (post) => {
         if (post) {
+          this.post.set(post);
           this.seoService.updateTitle(post.title);
-          this.seoService.updateMeta(post.excerpt, post.seo.keywords);
+          this.seoService.updateMeta(post.excerpt, post.seo?.keywords || []);
           this.seoService.updateOpenGraph({
-            title: post.seo.ogTitle,
-            description: post.seo.ogDescription,
-            image: post.seo.ogImage,
+            title: post.seo?.og_title || post.title,
+            description: post.seo?.og_description || post.excerpt,
+            image: post.seo?.og_image || '',
             url: this.isBrowser ? window.location.href : ''
           });
           this.seoService.generateStructuredData(post);
+          
+          this.loadAdditionalData(post.id);
         }
-      })
-    );
+      },
+      error: (err) => {
+        this.toastService.error('Erreur lors du chargement de l\'article.');
+        console.error(err);
+      }
+    });
+  }
+
+  private loadAdditionalData(postId: string) {
+    this.contentService.getRelatedPosts(postId).subscribe(posts => {
+      this.relatedPosts.set(posts);
+    });
+    
+    this.contentService.getPostNavigation(postId).subscribe(nav => {
+      this.navigation.set(nav);
+    });
   }
 
   @HostListener('window:scroll', [])
@@ -240,15 +259,43 @@ export class ArticleDetailComponent implements OnInit {
 
   onLike(id: string) {
     if (this.hasLiked()) return;
-    this.contentStore.likePost(id).subscribe(() => {
-      this.hasLiked.set(true);
+    this.contentStore.likePost(id).subscribe({
+      next: (newCount) => {
+        this.hasLiked.set(true);
+        this.toastService.success('Article ajouté à vos favoris !');
+        // Update local signal to reflect the precise new count from backend
+        const currentPost = this.post();
+        if (currentPost && newCount !== undefined) {
+          this.post.set({ ...currentPost, likesCount: newCount });
+        }
+      },
+      error: () => {
+        this.toastService.error('Une erreur est survenue.');
+      }
     });
   }
 
-  onSubmitComment(postId: string) {
+  onSubmitComment(post_id: string) {
     if (!this.newComment.trim()) return;
-    this.contentStore.addComment(postId, this.newComment.trim()).subscribe(() => {
-      this.newComment = '';
+    
+    const commentText = this.newComment.trim();
+    this.contentStore.addComment(post_id, commentText).subscribe({
+      next: (newCommentData) => {
+        this.newComment = '';
+        this.toastService.success('Votre commentaire a été posté avec succès !');
+        
+        // Update local signal immediately
+        const currentPost = this.post();
+        if (currentPost) {
+          this.post.set({ 
+            ...currentPost, 
+            comments: [...(currentPost.comments || []), newCommentData] 
+          });
+        }
+      },
+      error: () => {
+        this.toastService.error('Erreur lors de la publication de votre commentaire.');
+      }
     });
   }
 

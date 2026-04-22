@@ -19,7 +19,7 @@ import { LucideAngularModule } from 'lucide-angular';
         </div>
         <p class="stat-meta" *ngIf="meta">{{ meta }}</p>
       </div>
-      <div class="stat-icon" [ngClass]="label.toLowerCase().replace(' ', '-')">
+      <div class="stat-icon" [style.background]="accentBg" [style.color]="accentColor">
         <lucide-icon [name]="icon" size="20"></lucide-icon>
       </div>
     </div>
@@ -33,6 +33,8 @@ export class StatCardComponent {
   @Input() trend?: string;
   @Input() trendType: 'up' | 'down' | 'stable' = 'stable';
   @Input() meta?: string;
+  @Input() accentColor: string = '#2E6DA4';
+  @Input() accentBg: string = '#f0f7ff';
 
   get trendIcon() {
     if (this.trendType === 'up') return 'trending-up';

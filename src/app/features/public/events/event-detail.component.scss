@@ -587,3 +587,180 @@
         opacity: 1;
     }
 }
+
+// =============================================
+// Discussion Section
+// =============================================
+.discussion-section {
+    border-top: 1px solid $slate-100;
+    padding-top: 3rem;
+
+    .discussion-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        color: $slate-800;
+        margin-bottom: 2rem;
+        font-family: $font-display;
+        font-weight: 700;
+    }
+
+    .comment-input-area {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        background-color: #fafbfc;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid $slate-100;
+
+        @include mobile {
+            flex-direction: column;
+            padding: 1.25rem;
+        }
+
+        .avatar-placeholder {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: $slate-100;
+            @include flex-center;
+            color: $slate-400;
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+
+            textarea {
+                width: 100%;
+                min-height: 100px;
+                border: 1px solid $slate-200;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                font-family: inherit;
+                font-size: 0.9375rem;
+                margin-bottom: 0.75rem;
+                resize: none;
+                background-color: $white;
+                color: $slate-700;
+                transition: border-color 0.25s ease;
+
+                &::placeholder {
+                    color: $slate-400;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: $medium-blue;
+                }
+            }
+
+            .input-footer {
+                @include flex-between;
+
+                @include mobile {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+
+                .char-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    font-size: 0.75rem;
+                    color: $slate-400;
+                    font-weight: 500;
+                }
+
+                .submit-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    background-color: $slate-800;
+                    color: white;
+                    border: none;
+                    padding: 0.6rem 1.25rem;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.8125rem;
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+
+                    &:hover:not(:disabled) {
+                        background-color: $slate-800;
+                    }
+
+                    &:disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1.75rem 0;
+        border-top: 1px solid #f5f5f5;
+
+        @include mobile {
+            gap: 0.75rem;
+        }
+
+        .comment-avatar {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .comment-content-wrap {
+            .comment-header {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.35rem;
+
+                .comment-author {
+                    font-weight: 700;
+                    color: $slate-800;
+                    font-size: 0.875rem;
+                }
+
+                .comment-date {
+                    font-size: 0.75rem;
+                    color: $slate-400;
+                    font-weight: 500;
+
+                    &::before {
+                        content: "·";
+                        margin-right: 0.5rem;
+                    }
+                }
+            }
+
+            .comment-text {
+                color: $slate-600;
+                line-height: 1.65;
+                font-size: 0.9375rem;
+            }
+        }
+    }
+
+    .no-comments {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: $slate-400;
+
+        p {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: $slate-500;
+        }
+    }
+}

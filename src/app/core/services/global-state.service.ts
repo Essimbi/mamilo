@@ -15,6 +15,7 @@ export interface GlobalState {
     categories: Category[];
     tags: Tag[];
     isLoading: boolean;
+    isAuthInitialized: boolean;
     error: string | null;
     sidebarCollapsed: boolean;
 }
@@ -33,6 +34,7 @@ export class GlobalStateService {
         categories: [],
         tags: [],
         isLoading: false,
+        isAuthInitialized: false,
         error: null,
         sidebarCollapsed: false
     });
@@ -48,11 +50,16 @@ export class GlobalStateService {
     categories = computed(() => this._state().categories);
     tags = computed(() => this._state().tags);
     isLoading = computed(() => this._state().isLoading);
+    isAuthInitialized = computed(() => this._state().isAuthInitialized);
     error = computed(() => this._state().error);
     sidebarCollapsed = computed(() => this._state().sidebarCollapsed);
 
     // Actions
     setUser(user: User | null) {
+        this._state.update(s => ({ ...s, user }));
+    }
+
+    setAuthenticatedUser(user: User | null) {
         this._state.update(s => ({ ...s, user, isAuthenticated: !!user }));
     }
 
@@ -82,6 +89,10 @@ export class GlobalStateService {
 
     setLoading(isLoading: boolean) {
         this._state.update(s => ({ ...s, isLoading }));
+    }
+
+    setAuthInitialized(isAuthInitialized: boolean) {
+        this._state.update(s => ({ ...s, isAuthInitialized }));
     }
 
     setError(error: string | null) {

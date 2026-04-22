@@ -21,10 +21,10 @@ import { inject } from '@angular/core';
               <div class="logo-box">
                  <lucide-icon name="book-open" size="18"></lucide-icon>
               </div>
-              <span class="logo-text">{{ s()?.siteName || 'Mamilo Insights' }}</span>
+              <span class="logo-text">{{ s()?.site_name || 'Mamilo Insights' }}</span>
             </a>
             <p class="footer-description">
-              {{ s()?.siteDescription || 'Explorer l\\'esprit à travers les savoirs, la recherche, et les perspectives intellectuelles contemporaines.' }}
+              {{ s()?.site_description || 'Explorer l\\'esprit à travers les savoirs, la recherche, et les perspectives intellectuelles contemporaines.' }}
             </p>
             <div class="social-links">
               <a [href]="u()?.social?.twitter" *ngIf="u()?.social?.twitter" class="social-link" title="Twitter/X">
@@ -67,7 +67,7 @@ import { inject } from '@angular/core';
         <!-- Bottom Footer -->
         <div class="footer-bottom">
           <div class="copyright">
-            © {{ currentYear }} {{ s()?.siteName || 'Mamilo Insights' }}. Tous les droits réservés.
+            © {{ currentYear }} {{ s()?.site_name || 'Mamilo Insights' }}. Tous les droits réservés.
           </div>
         </div>
       </div>

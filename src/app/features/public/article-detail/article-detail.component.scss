@@ -2,80 +2,101 @@
 @use '../../../../styles/abstracts/variables' as *;
 @use '../../../../styles/abstracts/mixins' as *;
 
+// =============================================
+// Article Detail - Modern Soft Design
+// =============================================
+
+// Reading Progress
 .reading-progress {
     position: fixed;
-    top: 64px; // Fixed below navbar
+    top: 64px;
     left: 0;
     width: 100%;
-    height: 4px;
-    background-color: rgba($slate-200, 0.3);
-    z-index: 9998; // Just below navbar z-index (9999)
+    height: 3px;
+    background-color: transparent;
+    z-index: 9998;
     pointer-events: none;
 
     .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, $navy 0%, $medium-blue 100%);
+        background: linear-gradient(90deg, $medium-blue, color.adjust($medium-blue, $lightness: 15%));
         width: 0%;
-        transition: width 0.1s ease-out;
-        box-shadow: 0 0 10px rgba($navy, 0.3);
+        transition: width 0.15s ease-out;
+        border-radius: 0 2px 2px 0;
     }
 }
 
+// Container
 .article-container {
-    animation: fadeIn 0.7s ease-in-out forwards;
+    animation: fadeIn 0.5s ease-out forwards;
     background-color: $white;
     position: relative;
-    overflow: visible; // Allow sticky sidebar to be visible
+    overflow: visible;
 }
 
-// 0. Social Sidebar (Sticky)
+// =============================================
+// Social Sidebar
+// =============================================
 .social-sidebar {
     position: absolute;
-    left: 4rem;
-    top: 30rem;
-    height: calc(100% - 30rem);
+    left: 3rem;
+    top: 28rem;
+    height: calc(100% - 28rem);
     width: 3rem;
     z-index: 50;
 
-    @include tablet {
-        display: none; // Hide on tablet/mobile for now or reposition
-    }
-
-    @include mobile {
-        display: none;
-    }
+    @include tablet { display: none; }
+    @include mobile { display: none; }
 
     .sidebar-inner {
         position: sticky;
-        top: 15rem;
+        top: 12rem;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
         align-items: center;
+        background: $white;
+        border: 1px solid $slate-100;
+        border-radius: 2rem;
+        padding: 0.75rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 
         .social-icon {
             color: $slate-400;
             background: none;
             border: none;
-            padding: 0;
+            padding: 0.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             @include flex-center;
+            border-radius: 50%;
 
-            &.liked {
-                color: #e11d48; // rose-600
-                transform: scale(1.1);
+            &:hover {
+                color: $medium-blue;
+                background-color: rgba($medium-blue, 0.06);
+            }
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: $slate-400;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border-radius: 0.75rem;
+
+            &.active, &:hover {
+                color: #ef4444;
             }
 
-            .count {
-                font-size: 0.625rem;
-                font-weight: 800;
-                margin-top: 0.15rem;
-                color: $slate-500;
-            }
-
-            &.bookmark {
-                color: $slate-300;
+            span {
+                font-size: 0.6rem;
+                font-weight: 700;
             }
         }
 
@@ -83,39 +104,74 @@
             width: 1.5rem;
             height: 1px;
             background-color: $slate-100;
-            margin: 0.5rem 0;
         }
     }
 }
 
-// 1. Hero Section
-.article-hero {
-    padding: 8rem 0 5rem;
-    text-align: center;
-    background-color: $white;
+// =============================================
+// Hero Banner (Full Bleed)
+// =============================================
+.hero-banner {
+    position: relative;
+    width: 100%;
+    min-height: 60vh;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 4rem;
+    overflow: hidden;
+    background-color: $slate-800;
+
+    @include tablet { min-height: 50vh; }
+    @include mobile { 
+        min-height: 60vh; 
+        padding-top: 6rem;
+    }
+
+    .hero-image-wrapper {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba($slate-800, 0.1) 0%,
+                rgba($slate-800, 0.6) 50%,
+                rgba($slate-800, 0.95) 100%
+            );
+        }
+    }
 
     .hero-content {
         @include container;
-        max-width: 850px;
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        color: $white;
     }
 
     .breadcrumb {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
 
         a {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            color: $slate-400;
+            gap: 0.35rem;
+            color: rgba($white, 0.8);
             font-size: 0.8125rem;
             text-decoration: none;
-            font-weight: 500;
-            text-transform: lowercase;
-            transition: color 0.3s ease;
+            font-weight: 600;
+            transition: color 0.25s ease;
 
-            &:hover {
-                color: $navy;
-            }
+            &:hover { color: $white; }
         }
     }
 
@@ -123,416 +179,418 @@
         display: inline-block;
         font-size: 0.6875rem;
         font-weight: 800;
-        color: $medium-blue;
+        color: $white;
         text-transform: uppercase;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.15em;
         padding: 0.4rem 1.25rem;
-        background-color: rgba($medium-blue, 0.06);
-        border-radius: 4px;
+        background-color: rgba($white, 0.15);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba($white, 0.2);
+        border-radius: 100px;
         margin-bottom: 1.75rem;
     }
 
     .article-title {
-        font-size: clamp(2.25rem, 8vw, 3.75rem);
-        font-weight: 850;
-        color: $navy;
-        margin-bottom: 1.75rem;
+        font-size: clamp(2.25rem, 6vw, 3.5rem);
+        font-weight: 800;
+        color: $white;
+        margin-bottom: 1.25rem;
         font-family: $font-display;
         line-height: 1.15;
         letter-spacing: -0.02em;
-
-        @include desktop {
-            margin-bottom: 2rem;
-        }
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .article-subtitle {
-        font-size: 1.35rem;
-        color: $slate-600;
-        line-height: 1.5;
-        margin-bottom: 3.5rem;
-        font-style: italic;
+        font-size: 1.2rem;
+        color: rgba($white, 0.9);
+        line-height: 1.6;
+        margin-bottom: 3rem;
         font-family: $font-serif;
-        font-weight: 500;
-        max-width: 750px;
-        margin-left: auto;
-        margin-right: auto;
+        font-weight: 400;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .author-meta {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 1.25rem;
+        gap: 1rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba($white, 0.15);
 
         .author-avatar {
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 3rem;
+            height: 3rem;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid $slate-50;
+            border: 2px solid rgba($white, 0.3);
         }
 
         .meta-info {
-            text-align: left;
-
             .author-name {
                 display: block;
-                font-weight: 800;
-                color: $navy;
-                font-size: 1rem;
-                margin-bottom: 0.15rem;
+                font-weight: 700;
+                color: $white;
+                font-size: 0.9375rem;
+                margin-bottom: 0.2rem;
             }
 
             .sub-meta {
                 display: flex;
-                gap: 1.25rem;
-                font-size: 0.75rem;
-                color: $slate-400;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
+                gap: 0.5rem;
+                font-size: 0.8125rem;
+                color: rgba($white, 0.7);
+                font-weight: 500;
 
-                span {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.4rem;
-                }
+                .dot { opacity: 0.5; }
             }
         }
     }
-}
 
-// 2. Featured Image
-.featured-image-container {
-    @include container;
-    max-width: 1000px;
-    margin-bottom: 5rem;
-
-    .featured-image {
-        width: 100%;
-        border-radius: 1rem;
-        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
-        margin-bottom: 1.75rem;
-    }
-
-    .image-caption {
-        text-align: center;
-        font-size: 0.8125rem;
-        color: $slate-400;
+    .hero-image-caption {
+        font-size: 0.75rem;
+        color: rgba($white, 0.5);
+        margin-top: 1.5rem;
         font-style: italic;
-        font-weight: 500;
     }
 }
 
-// 3. Article Body
+// =============================================
+// Article Body
+// =============================================
 .article-main {
-    @include container;
-    max-width: 800px;
-    padding-bottom: 10rem;
+    padding-top: 4rem;
+    padding-bottom: 6rem;
 }
 
 .article-body {
-    font-family: $font-serif;
-    color: $slate-800;
-    line-height: 1.9;
-    font-size: 1.1875rem;
-    margin-bottom: 5rem;
+    margin-bottom: 4rem;
 
-    p {
-        margin-bottom: 2.25rem;
-    }
+    .content-block {
+        margin: 0 auto 2rem;
 
-    ::ng-deep {
-        h2 {
-            font-family: $font-display;
-            color: $navy;
-            font-size: 2.25rem;
-            margin: 4rem 0 1.75rem;
-            font-weight: 800;
-        }
-    }
-}
+        &.text-block {
+            @include container;
+            max-width: 680px;
 
-.highlight-quote {
-    background-color: #f7fbff;
-    border-left: 5px solid $medium-blue;
-    padding: 3.5rem 4.5rem;
-    margin: 4.5rem -2rem;
-    border-radius: 0 1rem 1rem 0;
+            font-family: $font-serif;
+            color: $slate-700;
+            line-height: 1.9;
+            font-size: 1.125rem;
 
-    @include mobile {
-        margin: 3rem 0;
-        padding: 2rem;
-    }
+            p { margin-bottom: 1.75rem; }
 
-    p {
-        font-family: $font-serif;
-        font-size: 1.65rem;
-        color: $medium-blue;
-        line-height: 1.5;
-        font-weight: 600;
-        margin-bottom: 1.25rem;
-        font-style: italic;
-    }
-
-    .quote-source {
-        font-size: 0.8125rem;
-        font-weight: 800;
-        color: $navy;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        position: relative;
-        padding-left: 2.5rem;
-
-        &::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 1.5rem;
-            height: 2px;
-            background-color: $medium-blue;
-        }
-    }
-}
-
-// 4. Data Section
-.data-section {
-    margin: 5rem 0;
-
-    .chart-container {
-        background-color: $white;
-        border: 1px solid $slate-100;
-        border-radius: 1.5rem;
-        padding: 3rem;
-        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04);
-
-        .chart-header {
-            margin-bottom: 2.5rem;
-
-            h3 {
-                color: $navy;
-                font-size: 1.35rem;
-                font-weight: 800;
-                margin-bottom: 0.5rem;
-            }
-
-            p {
-                color: $slate-500;
-                font-size: 0.9375rem;
-                font-weight: 500;
-            }
-        }
-
-        .chart-mockup {
-            background-color: $slate-800;
-            height: 350px;
-            border-radius: 1rem;
-            @include flex-center;
-            margin-bottom: 2.5rem;
-            position: relative;
-            overflow: hidden;
-
-            .chart-placeholder {
-                @include flex-center;
-                flex-direction: column;
-                color: $slate-600;
-                gap: 1.25rem;
-                z-index: 2;
-
-                span {
+            ::ng-deep {
+                h2 {
+                    font-family: $font-display;
+                    color: $slate-800;
+                    font-size: 1.85rem;
+                    margin: 3.5rem 0 1.5rem;
                     font-weight: 700;
-                    font-size: 0.8125rem;
+                    letter-spacing: -0.01em;
+                }
+
+                h3 {
+                    font-family: $font-display;
+                    color: $slate-800;
+                    font-size: 1.45rem;
+                    margin: 2.75rem 0 1rem;
+                    font-weight: 700;
+                }
+
+                h4 {
+                    font-family: $font-display;
+                    color: $slate-800;
+                    font-size: 1.2rem;
+                    margin: 2rem 0 0.75rem;
+                    font-weight: 700;
+                }
+
+                a {
+                    color: $medium-blue;
+                    text-decoration: underline;
+                    text-underline-offset: 3px;
+                    text-decoration-color: rgba($medium-blue, 0.3);
+                    transition: text-decoration-color 0.25s ease;
+
+                    &:hover { text-decoration-color: $medium-blue; }
+                }
+
+                strong { font-weight: 600; color: $slate-800; }
+            }
+        }
+
+        &.media-block {
+            @include container;
+            max-width: 900px; // Wider than text block
+            margin: 4rem auto;
+
+            img {
+                width: 100%;
+                border-radius: 1rem;
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            }
+
+            figcaption {
+                text-align: center;
+                font-size: 0.8125rem;
+                color: $slate-400;
+                font-style: italic;
+                margin-top: 1rem;
+            }
+        }
+
+        &.quote-block {
+            @include container;
+            max-width: 780px; // Slightly wider than text
+            margin: 3.5rem auto;
+
+            .highlight-quote {
+                background-color: rgba($medium-blue, 0.03);
+                border-left: 4px solid $medium-blue;
+                padding: 2.5rem 3rem;
+                border-radius: 0 1rem 1rem 0;
+
+                @include mobile {
+                    padding: 1.5rem 1.25rem;
+                }
+
+                p {
+                    font-family: $font-display;
+                    font-size: 1.5rem;
+                    color: $slate-800;
+                    line-height: 1.4;
+                    font-weight: 600;
+                    margin-bottom: 1rem !important;
+                    font-style: normal;
+                }
+
+                .quote-source {
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                    color: $medium-blue;
                     text-transform: uppercase;
-                    letter-spacing: 0.1em;
+                    letter-spacing: 0.05em;
                 }
             }
-
-            &::after {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(135deg, rgba($medium-blue, 0.2), transparent);
-            }
-        }
-
-        .chart-stat {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid $slate-50;
-
-            .stat-value {
-                font-size: 3rem;
-                font-weight: 900;
-                color: $medium-blue;
-                letter-spacing: -0.05em;
-            }
-
-            .stat-label {
-                color: $slate-600;
-                font-size: 1rem;
-                max-width: 300px;
-                line-height: 1.4;
-                font-weight: 600;
-            }
         }
     }
 }
 
-// 5. Tags Section
+.tags-section, .author-card, .post-navigation, .related-articles, .discussion-section {
+    @include container;
+    max-width: 680px;
+}
+
+// =============================================
+// Tags
+// =============================================
 .tags-section {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 6rem;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid $slate-100;
 
-    .tag-btn {
-        padding: 0.6rem 1.5rem;
-        background-color: $slate-50;
+    .tags-icon {
+        color: $slate-300;
+        margin-right: 0.25rem;
+    }
+
+    .tag-badge {
+        padding: 0.4rem 1rem;
+        background-color: #f8f9fa;
         color: $slate-500;
         font-size: 0.8125rem;
-        font-weight: 700;
+        font-weight: 600;
         text-decoration: none;
-        border-radius: 2rem;
-        border: 1.5px solid transparent;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 100px;
+        border: 1px solid $slate-100;
+        transition: all 0.25s ease;
 
         &:hover {
             background-color: $white;
-            border-color: $navy;
-            color: $navy;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: $medium-blue;
+            color: $medium-blue;
         }
     }
 }
 
-// 6. Author Card
+// =============================================
+// Author Card
+// =============================================
 .author-card {
-    background-color: $slate-50;
-    border-radius: 1.5rem;
-    padding: 2.5rem 1.5rem;
-    margin-bottom: 5rem;
+    background-color: #fafbfc;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid $slate-100;
 
     @include desktop {
-        padding: 3.5rem;
-        margin-bottom: 7rem;
+        padding: 2.5rem;
     }
 
     .author-card-content {
         display: flex;
-        gap: 3rem;
+        gap: 2rem;
         align-items: center;
 
         @include mobile {
             flex-direction: column;
             text-align: center;
-            align-items: center;
         }
 
         .author-card-avatar {
-            width: 8rem;
-            height: 8rem;
-            border-radius: 1rem;
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
 
             @include desktop {
-                width: 10rem;
-                height: 10rem;
+                width: 6rem;
+                height: 6rem;
             }
         }
 
         .author-card-info {
             .author-card-name {
-                font-size: 1.75rem;
-                color: $navy;
-                margin-bottom: 0.5rem;
-                font-weight: 800;
+                font-size: 1.25rem;
+                color: $slate-800;
+                margin-bottom: 0.25rem;
+                font-weight: 700;
                 font-family: $font-display;
             }
 
             .author-card-role {
                 font-size: 0.75rem;
-                font-weight: 900;
+                font-weight: 600;
                 color: $medium-blue;
                 text-transform: uppercase;
-                letter-spacing: 0.15em;
-                margin-bottom: 1.5rem;
-                display: block;
+                letter-spacing: 0.08em;
+                margin-bottom: 0.75rem;
             }
 
             .author-card-bio {
-                color: $slate-600;
+                color: $slate-500;
                 line-height: 1.6;
-                margin-bottom: 2rem;
-                font-size: 1rem;
-                font-weight: 500;
+                margin-bottom: 1.25rem;
+                font-size: 0.9375rem;
             }
 
             .read-more-link {
                 display: inline-flex;
                 align-items: center;
-                gap: 0.75rem;
-                color: $navy;
-                font-weight: 800;
+                gap: 0.5rem;
+                color: $medium-blue;
+                font-weight: 600;
                 text-decoration: none;
-                font-size: 0.8125rem;
-                padding: 0.75rem 1.5rem;
-                border: 2px solid $slate-200;
-                border-radius: 0.5rem;
-                background-color: white;
-                transition: all 0.3s ease;
+                font-size: 0.875rem;
+                transition: gap 0.25s ease;
 
                 &:hover {
-                    border-color: $navy;
-                    background-color: $navy;
-                    color: white;
+                    gap: 0.75rem;
                 }
             }
         }
     }
 }
 
-// 7. Related Articles
+// =============================================
+// Post Navigation
+// =============================================
+.post-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    margin: 2rem 0 3rem;
+    border-top: 1px solid $slate-100;
+    border-bottom: 1px solid $slate-100;
+
+    @include mobile {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .nav-prev, .nav-next {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .nav-next {
+        text-align: right;
+    }
+
+    .nav-label {
+        font-size: 0.625rem;
+        font-weight: 700;
+        color: $slate-400;
+        letter-spacing: 0.1em;
+    }
+
+    .nav-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: $slate-800;
+        text-decoration: none;
+        line-height: 1.35;
+        transition: color 0.25s ease;
+
+        &:hover {
+            color: $medium-blue;
+        }
+
+        &.justify-end {
+            justify-content: flex-end;
+        }
+    }
+}
+
+// =============================================
+// Related Articles
+// =============================================
 .related-articles {
     border-top: 1px solid $slate-100;
-    padding-top: 6rem;
-    margin-bottom: 8rem;
+    padding-top: 3rem;
+    margin-bottom: 4rem;
 
     .section-header {
         @include flex-between;
-        margin-bottom: 4rem;
+        margin-bottom: 2rem;
 
         @include mobile {
             flex-direction: column;
             align-items: flex-start;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         h2 {
-            font-size: 2rem;
-            color: $navy;
+            font-size: 1.5rem;
+            color: $slate-800;
             font-family: $font-display;
-            font-weight: 800;
+            font-weight: 700;
         }
 
         .view-all {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.35rem;
             color: $medium-blue;
             text-decoration: none;
-            font-weight: 800;
+            font-weight: 600;
             font-size: 0.875rem;
-            transition: all 0.3s ease;
+            transition: gap 0.25s ease;
 
             &:hover {
-                gap: 1rem;
-                color: $navy;
+                gap: 0.75rem;
             }
         }
     }
@@ -540,11 +598,10 @@
     .related-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 3rem;
+        gap: 1.5rem;
 
         @include tablet {
             grid-template-columns: repeat(2, 1fr);
-            gap: 2.5rem;
         }
 
         @include mobile {
@@ -554,79 +611,86 @@
 
     .related-card {
         cursor: pointer;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: 1px solid $slate-100;
+        transition: all 0.3s ease;
+
+        &:hover {
+            border-color: $slate-200;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
 
         .card-img {
             width: 100%;
-            height: 250px;
+            height: 180px;
             object-fit: cover;
-            border-radius: 1rem;
-            margin-bottom: 1.5rem;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        &:hover .card-img {
-            transform: scale(1.03) translateY(-10px);
+        .card-content {
+            padding: 1rem 1.25rem 1.25rem;
         }
 
         .card-category {
             font-size: 0.6875rem;
-            font-weight: 900;
+            font-weight: 700;
             color: $medium-blue;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             display: block;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .card-title {
-            font-size: 1.25rem;
-            color: $navy;
-            line-height: 1.35;
-            font-weight: 800;
-            transition: color 0.3s ease;
-
-            &:hover {
-                color: $medium-blue;
-            }
+            font-size: 1rem;
+            color: $slate-800;
+            line-height: 1.4;
+            font-weight: 700;
         }
     }
 }
 
-// 8. Discussions
+// =============================================
+// Discussion Section
+// =============================================
 .discussion-section {
-    background-color: $white;
     border-top: 1px solid $slate-100;
-    padding-top: 6rem;
+    padding-top: 3rem;
 
     .discussion-title {
         display: flex;
         align-items: center;
-        gap: 1.25rem;
-        font-size: 1.75rem;
-        color: $navy;
-        margin-bottom: 4rem;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        color: $slate-800;
+        margin-bottom: 2rem;
         font-family: $font-display;
-        font-weight: 800;
+        font-weight: 700;
     }
 
     .comment-input-area {
         display: flex;
-        gap: 2rem;
-        margin-bottom: 5rem;
-        background-color: $slate-50;
-        padding: 3rem;
-        border-radius: 2rem;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        background-color: #fafbfc;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid $slate-100;
 
         @include mobile {
             flex-direction: column;
-            padding: 2rem;
+            padding: 1.25rem;
         }
 
-        .current-user-avatar {
-            width: 3.5rem;
-            height: 3.5rem;
+        .avatar-placeholder {
+            width: 2.5rem;
+            height: 2.5rem;
             border-radius: 50%;
-            border: 3px solid white;
+            background-color: $slate-100;
+            @include flex-center;
+            color: $slate-400;
+            flex-shrink: 0;
         }
 
         .input-wrapper {
@@ -634,21 +698,25 @@
 
             textarea {
                 width: 100%;
-                min-height: 150px;
-                border: 2px solid $slate-100;
-                border-radius: 1rem;
-                padding: 1.5rem;
+                min-height: 100px;
+                border: 1px solid $slate-200;
+                border-radius: 0.5rem;
+                padding: 1rem;
                 font-family: inherit;
-                font-size: 1.0625rem;
-                margin-bottom: 1.5rem;
+                font-size: 0.9375rem;
+                margin-bottom: 0.75rem;
                 resize: none;
-                transition: all 0.3s ease;
+                background-color: $white;
+                color: $slate-700;
+                transition: border-color 0.25s ease;
+
+                &::placeholder {
+                    color: $slate-400;
+                }
 
                 &:focus {
                     outline: none;
                     border-color: $medium-blue;
-                    box-shadow: 0 0 0 5px rgba($medium-blue, 0.05);
-                    background-color: white;
                 }
             }
 
@@ -658,31 +726,39 @@
                 @include mobile {
                     flex-direction: column;
                     align-items: flex-start;
-                    gap: 2rem;
+                    gap: 1rem;
                 }
 
                 .char-info {
-                    font-size: 0.8125rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    font-size: 0.75rem;
                     color: $slate-400;
                     font-weight: 500;
                 }
 
                 .submit-btn {
-                    background-color: $navy;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    background-color: $slate-800;
                     color: white;
                     border: none;
-                    padding: 1rem 2.5rem;
-                    border-radius: 0.75rem;
-                    font-weight: 900;
-                    font-size: 0.9375rem;
+                    padding: 0.6rem 1.25rem;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.8125rem;
                     cursor: pointer;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    box-shadow: 0 4px 14px rgba($navy, 0.2);
+                    transition: all 0.25s ease;
 
-                    &:hover {
-                        background-color: $medium-blue;
-                        transform: translateY(-3px);
-                        box-shadow: 0 8px 20px rgba($medium-blue, 0.3);
+                    &:hover:not(:disabled) {
+                        background-color: $slate-800;
+                    }
+
+                    &:disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
                     }
                 }
             }
@@ -691,56 +767,102 @@
 
     .comment-item {
         display: flex;
-        gap: 2rem;
-        padding: 3.5rem 0;
-        border-top: 1px solid $slate-50;
+        gap: 1rem;
+        padding: 1.75rem 0;
+        border-top: 1px solid #f5f5f5;
 
         @include mobile {
-            gap: 1.5rem;
+            gap: 0.75rem;
+        }
+
+        .comment-avatar-wrapper {
+            flex-shrink: 0;
         }
 
         .comment-avatar {
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 2.25rem;
+            height: 2.25rem;
             border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-initial {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, $medium-blue, color.adjust($medium-blue, $lightness: -10%));
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+            @include flex-center;
+            text-transform: uppercase;
         }
 
         .comment-content {
             .comment-header {
                 display: flex;
                 align-items: center;
-                gap: 1rem;
-                margin-bottom: 0.75rem;
+                gap: 0.5rem;
+                margin-bottom: 0.35rem;
 
                 .comment-author {
-                    font-weight: 800;
-                    color: $navy;
-                    font-size: 1.0625rem;
+                    font-weight: 700;
+                    color: $slate-800;
+                    font-size: 0.875rem;
                 }
 
                 .comment-date {
-                    font-size: 0.8125rem;
-                    color: $slate-300;
-                    font-weight: 600;
+                    font-size: 0.75rem;
+                    color: $slate-400;
+                    font-weight: 500;
+
+                    &::before {
+                        content: "·";
+                        margin-right: 0.5rem;
+                    }
                 }
             }
 
             .comment-text {
                 color: $slate-600;
-                line-height: 1.7;
-                font-size: 1.0625rem;
-                font-weight: 500;
+                line-height: 1.65;
+                font-size: 0.9375rem;
             }
+        }
+    }
+
+    .no-comments {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: $slate-400;
+
+        lucide-icon {
+            margin-bottom: 0.75rem;
+            opacity: 0.3;
+        }
+
+        p {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: $slate-500;
+            margin-bottom: 0.25rem;
+        }
+
+        span {
+            font-size: 0.8125rem;
+            font-weight: 400;
         }
     }
 }
 
+// =============================================
+// Animations
+// =============================================
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);

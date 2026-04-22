@@ -7,6 +7,17 @@ import { SeoMeta } from './seo.model';
 export type PostType = 'article' | 'note' | 'recap';
 export type PostStatus = 'draft' | 'published' | 'scheduled' | 'archived';
 
+export interface ContentBlock {
+    type: 'paragraph' | 'heading' | 'image' | 'gallery' | 'quote';
+    position: number;
+    content: {
+        text?: string;
+        level?: number;
+        url?: string;
+        caption?: string;
+    };
+}
+
 export interface Comment {
     id: string;
     postId: string;
@@ -24,13 +35,14 @@ export interface Post {
     type: PostType;
     status: PostStatus;
     excerpt: string;
-    content: string;
+    blocks: ContentBlock[];
     readingTime: number;
     likesCount: number;
     comments: Comment[];
     coverImage: MediaAsset | null;
     author: User;
     category: Category;
+    categories?: Category[];
     tags: Tag[];
     event: Event | null;
     seo: SeoMeta;

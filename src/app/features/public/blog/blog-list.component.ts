@@ -6,7 +6,9 @@ import { SeoService } from '../../../core/services/seo.service';
 import { Post } from '../../../core/models/post.model';
 import { PostCardComponent } from '../../../shared/components/post-card.component';
 import { LucideAngularModule } from 'lucide-angular';
-import { map } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { IContentService } from '../../../core/services/content.interface';
 
 @Component({
   selector: 'app-blog-list',
@@ -46,15 +48,14 @@ import { map } from 'rxjs';
           </button>
         </div>
 
-        <!-- Grid -->
-        <div class="posts-list">
+        <div class="posts-list" *ngIf="posts$ | async as posts; else loading">
           <app-post-card 
-            *ngFor="let post of posts(); trackBy: trackByPost" 
+            *ngFor="let post of posts; trackBy: trackByPost" 
             [post]="post" 
             variant="horizontal"
           ></app-post-card>
 
-          <div *ngIf="posts().length === 0" class="empty-state">
+          <div *ngIf="posts.length === 0" class="empty-state">
             <lucide-icon name="file-text" size="48"></lucide-icon>
             <h3>Aucun article trouvé</h3>
           </div>
@@ -71,6 +72,7 @@ import { map } from 'rxjs';
 })
 export class BlogListComponent implements OnInit {
   private state = inject(GlobalStateService);
+  private contentService = inject(IContentService);
   private seoService = inject(SeoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -78,24 +80,7 @@ export class BlogListComponent implements OnInit {
   activeType = signal<string>('all');
   activeSearch = signal<string>('');
 
-  posts = computed(() => {
-    let filtered = this.state.posts();
-    const type = this.activeType();
-    const search = this.activeSearch().toLowerCase();
-
-    if (type !== 'all') {
-      filtered = filtered.filter(p => p.type === type);
-    }
-
-    if (search) {
-      filtered = filtered.filter(p => 
-        p.title.toLowerCase().includes(search) || 
-        p.excerpt.toLowerCase().includes(search)
-      );
-    }
-
-    return filtered;
-  });
+  posts$!: Observable<Post[]>;
 
   types = [
     { label: 'Tous', value: 'all' },
@@ -108,14 +93,26 @@ export class BlogListComponent implements OnInit {
     const s = this.state.settings();
     this.seoService.updateTitle('L\'Éditorial');
     this.seoService.updateMeta(
-      s?.siteDescription || 'Toutes les publications de Jean Dupont. Articles, notes et récaps de séminaires.',
-      s?.keywords || ['blog', 'éditorial', 'articles']
+      s?.site_description || 'Toutes les publications de Dr. Christian Mamilo. Articles, notes et récaps de séminaires.',
+      ['blog', 'éditorial', 'articles', 'mamilo']
     );
 
     this.route.queryParams.subscribe(params => {
       this.activeType.set(params['type'] || 'all');
       this.activeSearch.set(params['search'] || '');
     });
+
+    this.posts$ = this.route.queryParams.pipe(
+      switchMap(params => {
+        const filters: any = {};
+        if (params['category']) filters.category = params['category'];
+        if (params['tag']) filters.tag = params['tag'];
+        if (params['search']) filters.search = params['search'];
+        if (params['type'] && params['type'] !== 'all') filters.type = params['type'];
+        
+        return this.contentService.getPosts(filters).pipe(map(res => res.items));
+      })
+    );
   }
 
   clearSearch() {

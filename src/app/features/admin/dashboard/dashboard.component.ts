@@ -1,126 +1,286 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { IContentService } from '../../../core/services/content.interface';
 import { LucideAngularModule } from 'lucide-angular';
 import { GlobalStateService } from '../../../core/services/global-state.service';
-import { computed } from '@angular/core';
-import { Post } from '../../../core/models/post.model';
+import { ContentStore } from '../../../core/services/content-store.service';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader.component';
 
 import { StatCardComponent } from './components/stat-card/stat-card.component';
-import { RecentArticlesComponent } from './components/recent-articles/recent-articles.component';
-import { MediaGalleryWidgetComponent } from './components/media-gallery-widget/media-gallery-widget.component';
-import { EngagementCardComponent } from './components/engagement-card/engagement-card.component';
+import { ActivityTimelineComponent, TimelineItem } from './components/activity-timeline/activity-timeline.component';
+import { ContentChartComponent, ChartSegment } from './components/content-chart/content-chart.component';
+import { TopPostsComponent } from './components/top-posts/top-posts.component';
+import { UpcomingEventsComponent } from './components/engagement-card/engagement-card.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterModule,
-    LucideAngularModule,
-    StatCardComponent,
-    RecentArticlesComponent,
-    MediaGalleryWidgetComponent,
-    EngagementCardComponent
+    CommonModule, RouterModule, LucideAngularModule,
+    StatCardComponent, ActivityTimelineComponent, ContentChartComponent,
+    TopPostsComponent, UpcomingEventsComponent, SkeletonLoaderComponent
   ],
-  styleUrl: './dashboard.component.scss',
   template: `
     <div class="dashboard-page">
+      <!-- Skeleton while loading -->
+      <app-skeleton *ngIf="isLoading()" type="dashboard"></app-skeleton>
+
+      <ng-container *ngIf="!isLoading()">
       <header class="page-header">
         <div class="header-content">
-          <h1>Présentation du tableau de bord</h1>
-          <p>Gerez votre présence académique et analysez la performance de votre contenu.</p>
-        </div>
-        <div class="header-actions">
-          <button class="btn-outline">
-            <lucide-icon name="download" size="18"></lucide-icon>
-            Exporter
-          </button>
-          <button class="btn-primary" routerLink="/admin/posts/new">
-            <lucide-icon name="plus" size="18"></lucide-icon>
-            Nouvel Article
-          </button>
+          <div class="greeting">
+            <h1>Tableau de bord</h1>
+            <p>Vue d'ensemble de votre activité académique et de la performance du contenu.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-outline" routerLink="/admin/articles">
+              <lucide-icon name="layout-grid" size="16"></lucide-icon>
+              Articles
+            </button>
+            <button class="btn-primary" routerLink="/admin/posts/new">
+              <lucide-icon name="plus" size="16"></lucide-icon>
+              Nouveau
+            </button>
+          </div>
         </div>
       </header>
 
-      <!-- Stats Grid -->
+      <!-- Stats Row -->
       <div class="stats-grid">
-        <app-stat-card 
-          label="Vues totales" 
-          value="48.2k" 
-          icon="eye" 
-          trend="+12%" 
-          trendType="up"
-          meta="du mois dernier">
-        </app-stat-card>
-        <app-stat-card 
-          label="Nouvelles réactions" 
-          value="156" 
-          icon="message-circle" 
-          trend="+5%" 
-          trendType="up"
-          meta="du mois dernier">
-        </app-stat-card>
-        <app-stat-card 
-          label="Événements à venir" 
-          value="3" 
-          icon="calendar" 
-          trend="Stable" 
+        <app-stat-card
+          label="Articles publiés"
+          [value]="publishedCount()"
+          icon="book-open"
+          [trend]="draftCount() + ' brouillons'"
           trendType="stable"
-          meta="du mois dernier">
+          meta="total sur la plateforme"
+          accentColor="#3b82f6"
+          accentBg="#eff6ff">
         </app-stat-card>
-        <app-stat-card 
-          label="Brouillons actifs" 
-          value="7" 
-          icon="file-text" 
-          trend="+2" 
+        <app-stat-card
+          label="Événements"
+          [value]="totalEvents()"
+          icon="calendar"
+          [trend]="upcomingCount() + ' à venir'"
           trendType="up"
-          meta="du mois dernier">
+          meta="conférences et séminaires"
+          accentColor="#8b5cf6"
+          accentBg="#f5f3ff">
+        </app-stat-card>
+        <app-stat-card
+          label="Médias"
+          [value]="totalMedia()"
+          icon="image"
+          trend="Bibliothèque"
+          trendType="stable"
+          meta="images et fichiers"
+          accentColor="#10b981"
+          accentBg="#ecfdf5">
+        </app-stat-card>
+        <app-stat-card
+          label="Engagement"
+          [value]="totalLikes()"
+          icon="heart"
+          [trend]="totalComments() + ' commentaires'"
+          trendType="up"
+          meta="réactions totales"
+          accentColor="#f43f5e"
+          accentBg="#fff1f2">
         </app-stat-card>
       </div>
 
+      <!-- Main Grid -->
       <div class="main-grid">
-        <!-- Center Column -->
-        <div class="center-column" *ngIf="posts().length > 0; else noPosts">
-          <app-recent-articles [posts]="posts()"></app-recent-articles>
-        </div>
-        <ng-template #noPosts>
-           <div class="center-column" style="padding: 3rem; text-align: center; background: white; border-radius: 1rem;">
-              <p>Aucun article trouvé.</p>
-           </div>
-        </ng-template>
+        <!-- Left Column: Timeline + Content Charts -->
+        <div class="left-column">
+          <app-activity-timeline [items]="timelineItems()"></app-activity-timeline>
 
-        <!-- Right Column -->
-        <div class="right-column">
-          <app-media-gallery-widget [media]="mockMedia"></app-media-gallery-widget>
-          <app-engagement-card [engagement]="nextEngagement"></app-engagement-card>
+          <div class="charts-row">
+            <app-content-chart
+              title="Types de contenu"
+              subtitle="Répartition par type"
+              [segments]="typeSegments()">
+            </app-content-chart>
+            <app-content-chart
+              title="Statut des articles"
+              subtitle="Publiés vs Brouillons"
+              [segments]="statusSegments()">
+            </app-content-chart>
+          </div>
         </div>
-      </div>
+
+        <!-- Right Column: Top Posts + Upcoming Events -->
+        <div class="right-column">
+          <app-top-posts [posts]="topPosts()"></app-top-posts>
+          <app-upcoming-events [events]="upcomingEvents()"></app-upcoming-events>
+        </div>
+        </div>
+      </ng-container>
     </div>
-  `
+  `,
+  styles: [`
+    .dashboard-page {
+      padding: 2rem; max-width: 1400px; margin: 0 auto; background: #f8fafc; min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+      .header-content {
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .greeting {
+        h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0; }
+        p { font-size: 0.9rem; color: #64748b; margin: 0.3rem 0 0; }
+      }
+      .header-actions { display: flex; gap: 0.75rem; }
+    }
+
+    .btn-primary {
+      background: #0f172a; color: white; border: none; padding: 0.65rem 1.25rem;
+      border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+      display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;
+      &:hover { background: #1e293b; transform: translateY(-1px); }
+    }
+
+    .btn-outline {
+      background: white; color: #475569; border: 1px solid #e2e8f0; padding: 0.65rem 1.25rem;
+      border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+      display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;
+      &:hover { background: #f8fafc; border-color: #cbd5e1; }
+    }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem;
+    }
+
+    .main-grid {
+      display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem;
+    }
+
+    .left-column { display: flex; flex-direction: column; gap: 1.5rem; }
+    .right-column { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .charts-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .dashboard-page { padding: 1rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .page-header .header-content {
+        flex-direction: column; align-items: flex-start; gap: 1rem;
+        .header-actions { width: 100%; }
+      }
+    }
+  `]
 })
 export class DashboardComponent implements OnInit {
   private state = inject(GlobalStateService);
+  private store = inject(ContentStore);
 
-  posts = computed(() => this.state.posts().slice(0, 5));
+  // Raw data signals
+  private posts = this.state.posts;
+  private events = this.state.events;
+  private media = this.state.media;
   isLoading = this.state.isLoading;
 
-  mockMedia = [
-    { url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=150&q=80', alt: 'Meeting' },
-    { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=150&q=80', alt: 'Chart' },
-    { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=150&q=80', alt: 'Discussion' },
-    { url: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&w=150&q=80', alt: 'Office' },
-    { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=150&q=80', alt: 'Collaborate' },
-  ];
+  // Computed stats
+  publishedCount = computed(() => this.posts().filter(p => p.status === 'published').length);
+  draftCount = computed(() => this.posts().filter(p => p.status === 'draft').length);
+  totalEvents = computed(() => this.events().length);
+  upcomingCount = computed(() => this.events().filter(e => e.status === 'upcoming').length);
+  totalMedia = computed(() => this.media().length);
+  totalLikes = computed(() => {
+    const postLikes = this.posts().reduce((sum, p) => sum + (p.likesCount || 0), 0);
+    const eventLikes = this.events().reduce((sum, e) => sum + (e.likesCount || 0), 0);
+    return postLikes + eventLikes;
+  });
+  totalComments = computed(() =>
+    this.posts().reduce((sum, p) => sum + (p.comments?.length || 0), 0)
+  );
 
-  nextEngagement = {
-    title: 'Sommet mondial sur l\'éthique',
-    date: 'Demain',
-    time: '10:00 AM EST',
-    details: 'Conférence principale : La souveraineté'
-  };
+  // Top posts (by likes)
+  topPosts = computed(() =>
+    [...this.posts()]
+      .sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0))
+      .slice(0, 5)
+  );
 
-  ngOnInit(): void { }
+  // Upcoming events (sorted by date)
+  upcomingEvents = computed(() =>
+    this.events()
+      .filter(e => e.status === 'upcoming')
+      .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
+      .slice(0, 3)
+  );
+
+  // Content type distribution
+  typeSegments = computed((): ChartSegment[] => {
+    const posts = this.posts();
+    const articles = posts.filter(p => p.type === 'article').length;
+    const notes = posts.filter(p => p.type === 'note').length;
+    const recaps = posts.filter(p => p.type === 'recap').length;
+    return [
+      { label: 'Articles', value: articles, color: '#3b82f6' },
+      { label: 'Notes', value: notes, color: '#8b5cf6' },
+      { label: 'Récaps', value: recaps, color: '#f59e0b' },
+    ].filter(s => s.value > 0);
+  });
+
+  // Status distribution
+  statusSegments = computed((): ChartSegment[] => {
+    const posts = this.posts();
+    const published = posts.filter(p => p.status === 'published').length;
+    const drafts = posts.filter(p => p.status === 'draft').length;
+    const scheduled = posts.filter(p => p.status === 'scheduled').length;
+    return [
+      { label: 'Publiés', value: published, color: '#10b981' },
+      { label: 'Brouillons', value: drafts, color: '#94a3b8' },
+      { label: 'Planifiés', value: scheduled, color: '#f59e0b' },
+    ].filter(s => s.value > 0);
+  });
+
+  // Activity timeline
+  timelineItems = computed((): TimelineItem[] => {
+    const postItems: TimelineItem[] = this.posts()
+      .slice(0, 5)
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        type: 'post' as const,
+        action: p.status === 'published' ? 'Article publié' : 'Brouillon créé',
+        date: p.updatedAt || p.createdAt,
+        icon: 'file-text',
+      }));
+
+    const eventItems: TimelineItem[] = this.events()
+      .slice(0, 3)
+      .map(e => ({
+        id: e.id,
+        title: e.title,
+        type: 'event' as const,
+        action: 'Événement planifié',
+        date: e.createdAt,
+        icon: 'calendar',
+      }));
+
+    return [...postItems, ...eventItems]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 8);
+  });
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.store.loadAllInitialData();
+    });
+  }
 }
-

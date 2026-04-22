@@ -1,7 +1,7 @@
 import { MediaAsset } from './user.model';
 import { Post } from './post.model';
 
-export type EventType = 'conference' | 'seminar' | 'workshop' | 'webinar' | 'forum';
+export type EventType = string;
 
 export interface Event {
     id: string;
@@ -9,20 +9,14 @@ export interface Event {
     slug: string;
     type: EventType;
     description: string;
-    location: {
-        city: string;
-        country: string;
-        venue: string;
-        isOnline: boolean;
-        onlineUrl?: string;
-    };
-    startDate: string;
-    endDate: string;
-    externalUrl?: string;
-    role: 'speaker' | 'attendee' | 'organizer';
-    recap: Post | null;
-    coverImage: MediaAsset | null;
-    status: 'upcoming' | 'ongoing' | 'past';
+    location: string;
+    eventDate: string;
+    status: string;
     likesCount: number;
+    coverImage: MediaAsset | null;
+    gallery?: MediaAsset[];
+    recapArticle: { id: string; slug: string; title: string } | null;
+    seo?: { metaTitle?: string; metaDescription?: string; ogImageId?: string };
+    comments?: any[];
     createdAt: string;
 }

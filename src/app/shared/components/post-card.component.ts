@@ -243,7 +243,7 @@ import { LucideAngularModule, Clock, Calendar, User, Heart, MessageSquare } from
       <div class="card-content">
         <div class="card-tags">
           <app-badge-type [type]="post.type"></app-badge-type>
-          <span class="category-badge">
+          <span class="category-badge" *ngIf="post.category">
             {{ post.category.name }}
           </span>
         </div>
@@ -268,14 +268,14 @@ import { LucideAngularModule, Clock, Calendar, User, Heart, MessageSquare } from
             <span>{{ post.readingTime }} min</span>
           </div>
           <div class="meta-item" *ngIf="post.likesCount">
-            <lucide-icon name="heart" size="14"></lucide-icon>
+            <lucide-icon name="heart" [size]="14"></lucide-icon>
             <span>{{ post.likesCount }}</span>
           </div>
           <div class="meta-item">
             <lucide-icon name="message-square" size="14"></lucide-icon>
-            <span>{{ (post?.comments)?.length || 0 }}</span>
+            <span>{{ post.comments?.length || 0 }}</span>
           </div>
-          <div class="meta-item">
+          <div class="meta-item" *ngIf="post.author">
             <lucide-icon name="user" size="14"></lucide-icon>
             <span>{{ post.author.name }}</span>
           </div>

@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { IContentService, PostFilters, PaginationParams } from '../../core/services/content.interface';
-import { Post } from '../../core/models/post.model';
+import { Post, Comment, ContentBlock } from '../../core/models/post.model';
 import { Event } from '../../core/models/event.model';
 import { Category } from '../../core/models/category.model';
 import { Tag } from '../../core/models/tag.model';
@@ -90,20 +90,69 @@ export class ContentMockService implements IContentService {
         return of(posts).pipe(delay(500));
     }
 
-    getEvents(): Observable<Event[]> {
-        return of(this.events).pipe(delay(400));
+    getEvents(status?: 'upcoming' | 'past'): Observable<Event[]> {
+        let list = [...this.events];
+        if (status) list = list.filter(e => e.status === status);
+        return of(list).pipe(delay(400));
     }
 
-    getMedia(): Observable<MediaAsset[]> {
-        return of(this.media).pipe(delay(400));
+    getMedia(type?: string, search?: string): Observable<MediaAsset[]> {
+        let list = [...this.media];
+        if (type && type !== 'all') list = list.filter(m => m.mime_type.startsWith(type));
+        if (search) {
+            const q = search.toLowerCase();
+            list = list.filter(m => m.filename.toLowerCase().includes(q) || m.alt.toLowerCase().includes(q));
+        }
+        return of(list).pipe(delay(400));
+    }
+
+    getMediaById(id: string): Observable<MediaAsset> {
+        const asset = this.media.find(m => m.id === id);
+        if (!asset) throw new Error('Asset not found');
+        return of(asset).pipe(delay(200));
     }
 
     getCategories(): Observable<Category[]> {
         return of(MOCK_CATEGORIES).pipe(delay(200));
     }
 
+    getCategoryBySlug(slug: string): Observable<Category | null> {
+        const cat = MOCK_CATEGORIES.find(c => c.slug === slug);
+        return of(cat || null).pipe(delay(200));
+    }
+
     getTags(): Observable<Tag[]> {
         return of(MOCK_TAGS).pipe(delay(200));
+    }
+
+    // Category CRUD
+    createCategory(category: Partial<Category>): Observable<Category> {
+        const newCat = { id: 'cat-' + Date.now(), ...category } as Category;
+        return of(newCat).pipe(delay(300));
+    }
+
+    updateCategory(id: string, category: Partial<Category>): Observable<Category> {
+        const updatedCat = { id, ...category } as Category;
+        return of(updatedCat).pipe(delay(300));
+    }
+
+    deleteCategory(id: string): Observable<boolean> {
+        return of(true).pipe(delay(300));
+    }
+
+    // Tag CRUD
+    createTag(tag: Partial<Tag>): Observable<Tag> {
+        const newTag = { id: 'tag-' + Date.now(), ...tag } as Tag;
+        return of(newTag).pipe(delay(300));
+    }
+
+    updateTag(id: string, tag: Partial<Tag>): Observable<Tag> {
+        const updatedTag = { id, ...tag } as Tag;
+        return of(updatedTag).pipe(delay(300));
+    }
+
+    deleteTag(id: string): Observable<boolean> {
+        return of(true).pipe(delay(300));
     }
 
     createPost(post: Partial<Post>): Observable<Post> {
@@ -112,18 +161,18 @@ export class ContentMockService implements IContentService {
             title: post.title || 'Untitled',
             slug: post.slug || 'untitled',
             excerpt: post.excerpt || '',
-            content: post.content || '',
+            blocks: post.blocks || [],
             status: post.status as any || 'draft',
             type: post.type as any || 'article',
             readingTime: 5,
             coverImage: null,
             event: null,
             seo: { 
-                metaTitle: '', 
-                metaDescription: '', 
-                ogTitle: '', 
-                ogDescription: '', 
-                ogImage: '', 
+                meta_title: '', 
+                meta_description: '', 
+                og_title: '', 
+                og_description: '', 
+                og_image: '', 
                 keywords: [] 
             },
             publishedAt: null,
@@ -164,12 +213,11 @@ export class ContentMockService implements IContentService {
             slug: event.slug || 'untitled',
             type: event.type || 'conference',
             description: event.description || '',
-            location: event.location || { city: '', country: '', venue: '', isOnline: false },
-            startDate: event.startDate || new Date().toISOString(),
-            endDate: event.endDate || new Date().toISOString(),
-            role: event.role || 'speaker',
-            recap: null,
+            location: event.location || '',
+            eventDate: event.eventDate || new Date().toISOString(),
+            recapArticle: null,
             coverImage: event.coverImage || null,
+            gallery: event.gallery || [],
             status: event.status || 'upcoming',
             likesCount: 0,
             createdAt: new Date().toISOString()
@@ -194,18 +242,31 @@ export class ContentMockService implements IContentService {
         return of(this.events.length < initialLength).pipe(delay(300));
     }
 
-    uploadMedia(asset: Partial<MediaAsset>): Observable<MediaAsset> {
+    uploadMedia(file: File | any): Observable<MediaAsset> {
+        let assetData: any = {};
+        if (file instanceof File) {
+            assetData = {
+                url: URL.createObjectURL(file), // Mock URL
+                filename: file.name,
+                mime_type: file.type,
+                size: file.size,
+                alt: file.name
+            };
+        } else {
+            assetData = file;
+        }
+
         const newAsset: MediaAsset = {
             id: 'img-' + Date.now(),
-            url: asset.url || '',
-            thumbnailUrl: asset.thumbnailUrl || asset.url || '',
-            filename: asset.filename || 'upload.jpg',
-            mimeType: asset.mimeType || 'image/jpeg',
-            width: asset.width || 800,
-            height: asset.height || 600,
-            size: asset.size || 0,
-            alt: asset.alt || asset.filename || '',
-            uploadedAt: new Date().toISOString()
+            url: assetData.url || '',
+            thumbnail_url: assetData.thumbnail_url || assetData.url || '',
+            filename: assetData.filename || 'upload.jpg',
+            mime_type: assetData.mime_type || 'image/jpeg',
+            width: assetData.width || 800,
+            height: assetData.height || 600,
+            size: assetData.size || 0,
+            alt: assetData.alt || assetData.filename || '',
+            uploaded_at: new Date().toISOString()
         };
         this.media = [newAsset, ...this.media];
         this.saveToStorage(this.MEDIA_KEY, this.media);
@@ -217,6 +278,19 @@ export class ContentMockService implements IContentService {
         this.media = this.media.filter(m => m.id !== id);
         this.saveToStorage(this.MEDIA_KEY, this.media);
         return of(this.media.length < initialLength).pipe(delay(300));
+    }
+
+    updateMedia(id: string, metadata: { alt?: string; description?: string }): Observable<MediaAsset> {
+        const index = this.media.findIndex(m => m.id === id);
+        if (index === -1) throw new Error('Asset not found');
+        
+        this.media[index] = { 
+            ...this.media[index], 
+            alt: metadata.alt || this.media[index].alt,
+            caption: metadata.description || this.media[index].caption 
+        };
+        this.saveToStorage(this.MEDIA_KEY, this.media);
+        return of(this.media[index]).pipe(delay(300));
     }
 
     getProfile(): Observable<User> {
@@ -274,22 +348,48 @@ export class ContentMockService implements IContentService {
         return of(this.events[index].likesCount).pipe(delay(200));
     }
 
-    addComment(postId: string, comment: any): Observable<any> {
-        const index = this.posts.findIndex(p => p.id === postId);
+    addComment(post_id: string, comment: any): Observable<any> {
+        const index = this.posts.findIndex(p => p.id === post_id);
         if (index === -1) throw new Error('Post not found');
 
-        const newComment = {
-            id: 'cmt-' + Date.now(),
-            postId,
-            authorName: comment.authorName || 'Anonyme',
-            authorAvatar: comment.authorAvatar || 'assets/images/mock/avatar.jpg',
+        const newComment: Comment = {
+            id: 'c-' + Date.now(),
+            postId: post_id,
+            authorName: comment.authorName || comment.author_name || 'Anonymous',
+            authorAvatar: comment.authorAvatar || comment.author_avatar || '',
             content: comment.content,
             createdAt: new Date().toISOString(),
-            isApproved: true // Mock auto-approve
+            isApproved: true
         };
 
         this.posts[index].comments = [...this.posts[index].comments || [], newComment];
         this.saveToStorage(this.STORAGE_KEY, this.posts);
         return of(newComment).pipe(delay(400));
+    }
+
+    subscribeNewsletter(email: string): Observable<any> {
+        return of({ success: true, message: 'Inscription réussie.' }).pipe(delay(500));
+    }
+
+    sendContactMessage(data: { name: string; email: string; subject: string; message: string }): Observable<any> {
+        return of({ success: true, message: 'Message envoyé.' }).pipe(delay(500));
+    }
+
+    getRelatedPosts(postId: string): Observable<Post[]> {
+        const current = this.posts.find(p => p.id === postId);
+        if (!current) return of([]).pipe(delay(300));
+        const related = this.posts
+            .filter(p => p.id !== postId && p.status === 'published')
+            .slice(0, 3);
+        return of(related).pipe(delay(300));
+    }
+
+    getPostNavigation(postId: string): Observable<{ previous: Post | null; next: Post | null }> {
+        const published = this.posts.filter(p => p.status === 'published');
+        const idx = published.findIndex(p => p.id === postId);
+        return of({
+            previous: idx > 0 ? published[idx - 1] : null,
+            next: idx < published.length - 1 ? published[idx + 1] : null
+        }).pipe(delay(300));
     }
 }

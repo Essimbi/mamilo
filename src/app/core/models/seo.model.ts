@@ -1,9 +1,9 @@
 export interface SeoMeta {
-    metaTitle: string;
-    metaDescription: string;
-    ogTitle: string;
-    ogDescription: string;
-    ogImage: string;
-    canonicalUrl?: string;
+    meta_title: string;
+    meta_description: string;
+    og_title: string;
+    og_description: string;
+    og_image: string;
+    canonical_url?: string;
     keywords: string[];
 }

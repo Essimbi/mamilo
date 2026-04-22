@@ -147,8 +147,8 @@ import { LucideAngularModule, Linkedin, Twitter, GraduationCap } from 'lucide-an
         <!-- Avatar -->
         <div class="avatar-wrapper">
           <img 
-            [src]="author?.avatar?.url" 
-            [alt]="author?.avatar?.alt"
+            [src]="author.avatar?.url || 'assets/images/default-avatar.png'" 
+            [alt]="author.avatar?.alt || author.name"
             class="author-avatar"
           >
           <div class="badge-icon">
@@ -158,20 +158,20 @@ import { LucideAngularModule, Linkedin, Twitter, GraduationCap } from 'lucide-an
 
         <!-- Info -->
         <div class="author-info">
-          <h4 class="author-name">{{ author?.name }}</h4>
+          <h4 class="author-name">{{ author.name }}</h4>
           <p class="author-role">
-            {{ author?.role === 'admin' ? 'Expert Consultant' : 'Éditeur' }}
+            {{ author.role === 'admin' ? 'Expert Consultant' : 'Éditeur' }}
           </p>
           
           <p class="author-bio">
-            "{{ author?.bio }}"
+            "{{ author.bio }}"
           </p>
 
           <!-- Social Links -->
           <div class="social-links">
             <a 
-              *ngIf="author?.social?.linkedin" 
-              [href]="author?.social?.linkedin"
+              *ngIf="author.social?.linkedin" 
+              [href]="author.social?.linkedin"
               target="_blank"
               class="social-link linkedin"
               title="LinkedIn"
@@ -179,8 +179,8 @@ import { LucideAngularModule, Linkedin, Twitter, GraduationCap } from 'lucide-an
               <lucide-icon name="linkedin" size="20"></lucide-icon>
             </a>
             <a 
-              *ngIf="author?.social?.twitter" 
-              [href]="author?.social?.twitter"
+              *ngIf="author.social?.twitter" 
+              [href]="author.social?.twitter"
               target="_blank"
               class="social-link twitter"
               title="Twitter / X"

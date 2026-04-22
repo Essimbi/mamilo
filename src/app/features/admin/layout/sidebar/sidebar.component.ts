@@ -1,7 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, LayoutGrid, FileText, Calendar, Image, Settings, LogOut } from 'lucide-angular';
+import { LucideAngularModule, LayoutGrid, FileText, Hash, Calendar, Image, Settings, LogOut, Tag } from 'lucide-angular';
 import { AuthService } from '../../../../core/services/auth.service';
 import { GlobalStateService } from '../../../../core/services/global-state.service';
 
@@ -35,7 +35,11 @@ const ICONS = { LayoutGrid, FileText, Calendar, Image, Settings, LogOut };
 
       <div class="sidebar-footer" *ngIf="user() as u">
         <div class="user-profile">
-          <img [src]="u.avatar.url" [alt]="u.name" class="avatar">
+          <img 
+            [src]="u.avatar?.url || 'assets/images/default-avatar.png'" 
+            [alt]="u.avatar?.alt || u.name"
+            class="avatar"
+          >
           <div class="user-info">
             <span class="user-name">{{ u.name }}</span>
             <span class="user-role">Admin</span>
@@ -58,6 +62,8 @@ export class SidebarComponent {
   navItems = [
     { path: '/admin', label: 'Tableau de bord', icon: 'layout-grid', exact: true },
     { path: '/admin/articles', label: 'Articles', icon: 'file-text', exact: false },
+    { path: '/admin/categories', label: 'Catégories', icon: 'hash', exact: false },
+    { path: '/admin/tags', label: 'Tags', icon: 'tag', exact: false },
     { path: '/admin/events', label: 'Événements', icon: 'calendar', exact: false },
     { path: '/admin/media', label: 'Gestionnaire de médias', icon: 'image', exact: false },
     { path: '/admin/settings', label: 'Paramètres', icon: 'settings', exact: false }
