@@ -4,26 +4,28 @@ export const serverRoutes: ServerRoute[] = [
   // === Routes publiques dynamiques (slug inconnu au build) ===
   {
     path: 'articles/:slug',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Client,
   },
   {
     path: 'events/:slug',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Client,
   },
 
   // === Routes admin (protégées + paramètres dynamiques) ===
   {
     path: 'admin',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Client,
   },
   {
     path: 'admin/**',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Client,
   },
 
   // === Routes statiques publiques (pré-rendues au build) ===
   {
     path: '**',
-    renderMode: RenderMode.Prerender,
+    renderMode: RenderMode.Client,
   },
 ];
+
+

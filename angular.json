@@ -55,6 +55,9 @@
                 }
               ],
               "outputHashing": "all",
+              "prerender": false,          
+              "ssr": false,
+              "outputMode": "static",
               "optimization": {
                 "fonts": {
                   "inline": false
