@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  angular-app:
+    container_name: mamilo-front
+    image: blog-mamilo:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"          # Port accessible sur l'hôte (http://localhost:8080)
+    restart: unless-stopped
+    networks:
+      - mamilo-network
+
+networks:
+  mamilo-network:
+    name: api-blog_mamilo-network  # Nom par défaut du réseau créé par le docker-compose du dossier api-blog
+    external: true
