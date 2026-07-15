@@ -13,7 +13,7 @@ import { MediaAsset, User, SiteSettings } from '../models/user.model';
 })
 export class ContentHttpService extends IContentService {
     private http = inject(HttpClient);
-    private readonly API_URL = '/api/v1';
+    private readonly API_URL = 'https://api.christianmamilo.com/api/v1';
 
     private mapPost(data: any): Post {
         if (!data) return data;

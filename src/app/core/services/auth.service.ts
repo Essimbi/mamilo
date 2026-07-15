@@ -16,6 +16,7 @@ export class AuthService {
     private router = inject(Router);
     private http = inject(HttpClient);
     private readonly TOKEN_COOKIE = 'mamilo_auth_token';
+    private readonly API_URL = 'https://api.christianmamilo.com/api/v1';
 
     constructor() {
         if (this.isBrowser) {
@@ -30,7 +31,7 @@ export class AuthService {
 
         return this.http
             .post<{ success: boolean; message: string; data: { accessToken: string; user: User } }>(
-                '/api/v1/auth/login',
+                `${this.API_URL}/auth/login`,
                 {
                     email: credentials.email,
                     password: credentials.password
@@ -57,7 +58,7 @@ export class AuthService {
     me() {
         return this.http
             .get<{ success: boolean; message: string; data: User }>(
-                '/api/v1/auth/me'
+                `${this.API_URL}/auth/me`
             )
             .pipe(
                 map(res => res.data)
