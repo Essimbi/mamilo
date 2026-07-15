@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+    image: blog-front:prod
+    container_name: blog-front-prod
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+    restart: unless-stopped
+
+  dev:
+    build:
+      context: .
+      target: development
+    image: blog-front:dev
+    container_name: blog-front-dev
+    ports:
+      - "4200:4200"
+    environment:
+      PORT: 4200
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npm start -- --host 0.0.0.0 --port 4200"
