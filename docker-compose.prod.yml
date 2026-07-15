@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+    image: blog-front:prod
+    container_name: blog-front-prod
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+    expose:
+      - "4000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.blog_front.rule=Host(`christianmamilo.com`) || Host(`www.christianmamilo.com`)
+      - traefik.http.routers.blog_front.entrypoints=websecure
+      - traefik.http.routers.blog_front.tls.certresolver=letsencrypt
+      - traefik.http.services.blog_front.loadbalancer.server.port=4000
